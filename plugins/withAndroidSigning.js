@@ -9,7 +9,7 @@ function withAndroidSigning(config) {
   return withAppBuildGradle(config, (modConfig) => {
     let contents = modConfig.modResults.contents;
 
-    // 1. Ensure signingConfigs has a release block matching debug
+    // 1. Ensure release signing config exists and points to debug.keystore
     const releaseSigningBlock = `
         release {
             storeFile file('debug.keystore')
@@ -18,7 +18,7 @@ function withAndroidSigning(config) {
             keyPassword 'android'
         }`;
 
-    if (!contents.includes("storeFile file('debug.keystore')")) {
+    if (!contents.includes("release {\n            storeFile")) {
       contents = contents.replace(
         /signingConfigs\s*\{/,
         `signingConfigs {${releaseSigningBlock}`

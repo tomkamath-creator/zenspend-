@@ -144,7 +144,8 @@ export const SettingsScreen = () => {
         </Card>
 
         <View style={styles.aboutCard}>
-          <Text style={styles.aboutBrand}>🌿 SereneSpend v1.0.0</Text>
+          <Text style={styles.aboutBrand}>🌿 SereneSpend by VK</Text>
+          <Text style={styles.aboutAuthor}>Designed & Built by VK</Text>
           <Text style={styles.aboutDesc}>
             100% Free • Completely Offline • Zero Internet • Zero Cloud Fees
           </Text>
@@ -278,7 +279,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: THEME.colors.textPrimary,
-    marginBottom: 4,
+    marginBottom: 2,
+  },
+  aboutAuthor: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.primary,
+    marginBottom: 6,
   },
   aboutDesc: {
     fontSize: 12,

@@ -46,9 +46,12 @@ export const DashboardScreen = ({
           <View>
             <View style={styles.brandRow}>
               <Text style={styles.greetingTitle}>SereneSpend</Text>
+              <View style={styles.vkBadge}>
+                <Text style={styles.vkBadgeText}>by VK</Text>
+              </View>
               <View style={styles.offlinePill}>
-                <MaterialIcons name="cloud-off" size={12} color={THEME.colors.primary} />
-                <Text style={styles.offlinePillText}>100% Offline</Text>
+                <MaterialIcons name="cloud-off" size={11} color={THEME.colors.primary} />
+                <Text style={styles.offlinePillText}>Offline</Text>
               </View>
             </View>
             <Text style={styles.greetingSubtitle}>Mindful, stress-free money tracking</Text>
@@ -151,6 +154,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: THEME.colors.textPrimary,
     letterSpacing: -0.5,
+  },
+  vkBadge: {
+    backgroundColor: THEME.colors.surfaceSecondary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: THEME.borderRadius.round,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+  },
+  vkBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: THEME.colors.primary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   offlinePill: {
     flexDirection: 'row',
