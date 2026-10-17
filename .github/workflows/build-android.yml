@@ -12,11 +12,11 @@ on:
       build_type:
         description: 'Build Type'
         required: true
-        default: 'debug'
+        default: 'release'
         type: choice
         options:
-          - debug
           - release
+          - debug
 
 jobs:
   build-apk:
@@ -50,20 +50,50 @@ jobs:
       - name: Make Gradle Executable
         run: chmod +x android/gradlew
 
-      - name: Build Android APK with Gradle
+      - name: Configure Android Signing for Standalone APK
+        run: |
+          node -e '
+          const fs = require("fs");
+          const path = "android/app/build.gradle";
+          if (fs.existsSync(path)) {
+            let c = fs.readFileSync(path, "utf8");
+            c = c.replace(/signingConfig signingConfigs\.release/g, "signingConfig signingConfigs.debug");
+            c = c.replace(/enableProguardInReleaseBuilds\s*=\s*true/g, "enableProguardInReleaseBuilds = false");
+            c = c.replace(/minifyEnabled\s+true/g, "minifyEnabled false");
+            if (!c.includes("signingConfig signingConfigs.debug")) {
+              c = c.replace(/buildTypes\s*\{\s*release\s*\{/, "buildTypes {\n        release {\n            signingConfig signingConfigs.debug");
+            }
+            fs.writeFileSync(path, c);
+            console.log("Configured build.gradle for standalone release APK");
+          }
+          '
+
+      - name: Build Standalone Android APK with Gradle
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon || {
+            echo "Release assemble failed, fallback to bundled debug assemble..."
+            cd ..
+            mkdir -p android/app/src/main/assets
+            npx expo export:embed --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+            cd android
+            ./gradlew assembleDebug --no-daemon
+          }
 
       - name: Locate & Prepare APK
         run: |
           mkdir -p output
-          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
+          APK_PATH=$(find android/app/build/outputs/apk -name "*release*.apk" -not -name "*unaligned*" | head -n 1)
+          if [ -z "$APK_PATH" ] || [ ! -f "$APK_PATH" ]; then
+            APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -not -name "*unaligned*" | head -n 1)
+          fi
           if [ -f "$APK_PATH" ]; then
             cp "$APK_PATH" output/SereneSpend.apk
-            echo "APK ready at output/SereneSpend.apk"
+            echo "Standalone APK ready at output/SereneSpend.apk"
+            ls -lh output/SereneSpend.apk
           else
             echo "Error: APK not found!"
+            find android/app/build/outputs -type f || true
             exit 1
           fi
 
