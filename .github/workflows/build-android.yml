@@ -50,11 +50,6 @@ jobs:
       - name: Make Gradle Executable
         run: chmod +x android/gradlew
 
-      - name: Ensure Android Release Signing
-        run: |
-          cd android
-          sed -i 's/signingConfig signingConfigs\.release/signingConfig signingConfigs\.debug/g' app/build.gradle || true
-          cd ..
 
       - name: Build Standalone Android Release APK
         run: |
