@@ -5,7 +5,6 @@ const STORAGE_KEYS = {
   EXPENSES: '@serenespend_expenses_v1',
   BUDGET: '@serenespend_monthly_budget_v1',
   CURRENCY: '@serenespend_currency_v1',
-  APP_LOCK_SETTINGS: '@serenespend_lock_settings_v1',
   INITIALIZED: '@serenespend_initialized_v1',
 };
 
@@ -191,22 +190,6 @@ export const saveCurrency = async (currency) => {
   }
 };
 
-export const loadLockSettings = async () => {
-  try {
-    const data = await AsyncStorage.getItem(STORAGE_KEYS.APP_LOCK_SETTINGS);
-    return data ? JSON.parse(data) : { isEnabled: false, pin: null, useBiometrics: true };
-  } catch (error) {
-    return { isEnabled: false, pin: null, useBiometrics: true };
-  }
-};
-
-export const saveLockSettings = async (settings) => {
-  try {
-    await AsyncStorage.setItem(STORAGE_KEYS.APP_LOCK_SETTINGS, JSON.stringify(settings));
-  } catch (error) {
-    console.error('Failed to save lock settings:', error);
-  }
-};
 
 export const clearAllData = async () => {
   try {

@@ -18,15 +18,11 @@ import { ReportsScreen } from './src/screens/ReportsScreen';
 import { SettingsScreen } from './src/screens/SettingsScreen';
 import { AddExpenseModal } from './src/components/AddExpenseModal';
 import { ReceiptViewerModal } from './src/components/ReceiptViewerModal';
-import { PinLockScreen } from './src/components/PinLockScreen';
 
 const MainNavigator = () => {
   const {
     isLoading,
-    isLocked,
-    lockSettings,
     currency,
-    unlockApp,
     addExpense,
     updateExpense,
   } = useExpense();
@@ -154,15 +150,6 @@ const MainNavigator = () => {
         expense={viewingReceipt.expense}
         onClose={() => setViewingReceipt({ visible: false, uri: null, expense: null })}
       />
-
-      {lockSettings.isEnabled && (
-        <PinLockScreen
-          visible={isLocked}
-          savedPin={lockSettings.pin}
-          useBiometrics={lockSettings.useBiometrics}
-          onUnlockSuccess={unlockApp}
-        />
-      )}
     </View>
   );
 };

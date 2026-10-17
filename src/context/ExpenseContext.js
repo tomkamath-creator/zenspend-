@@ -6,8 +6,6 @@ import {
   saveBudget,
   loadCurrency,
   saveCurrency,
-  loadLockSettings,
-  saveLockSettings,
   saveReceiptImageOffline,
   deleteReceiptImage,
   clearAllData,
@@ -19,28 +17,20 @@ export const ExpenseProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [budget, setBudget] = useState(1500);
   const [currency, setCurrency] = useState('$');
-  const [lockSettings, setLockSettings] = useState({ isEnabled: false, pin: null, useBiometrics: true });
-  const [isLocked, setIsLocked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const init = async () => {
       try {
-        const [savedExpenses, savedBudget, savedCurrency, savedLock] = await Promise.all([
+        const [savedExpenses, savedBudget, savedCurrency] = await Promise.all([
           loadExpenses(),
           loadBudget(),
           loadCurrency(),
-          loadLockSettings(),
         ]);
 
         setExpenses(savedExpenses);
         setBudget(savedBudget);
         setCurrency(savedCurrency);
-        setLockSettings(savedLock);
-
-        if (savedLock.isEnabled) {
-          setIsLocked(true);
-        }
       } catch (err) {
         console.error('Initialization error:', err);
       } finally {
@@ -174,21 +164,6 @@ export const ExpenseProvider = ({ children }) => {
     await saveCurrency(newCurrency);
   };
 
-  const updateLockSettings = async (newSettings) => {
-    setLockSettings(newSettings);
-    await saveLockSettings(newSettings);
-  };
-
-  const unlockApp = () => {
-    setIsLocked(false);
-  };
-
-  const lockApp = () => {
-    if (lockSettings.isEnabled) {
-      setIsLocked(true);
-    }
-  };
-
   const resetAllExpenses = async () => {
     for (const exp of expenses) {
       if (exp.receiptUri) {
@@ -208,8 +183,6 @@ export const ExpenseProvider = ({ children }) => {
         expenses,
         budget,
         currency,
-        lockSettings,
-        isLocked,
         isLoading,
         metrics,
         addExpense,
@@ -217,9 +190,6 @@ export const ExpenseProvider = ({ children }) => {
         deleteExpense,
         updateBudget,
         updateCurrency,
-        updateLockSettings,
-        unlockApp,
-        lockApp,
         resetAllExpenses,
       }}
     >

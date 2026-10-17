@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
-  TextInput,
   Alert,
   SafeAreaView,
   StatusBar,
@@ -14,7 +12,6 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 import { THEME } from '../constants/theme';
 import { useExpense } from '../context/ExpenseContext';
-import { checkBiometricsAvailable } from '../services/authService';
 import { Card } from '../components/Card';
 import { SetBudgetModal } from '../components/SetBudgetModal';
 
@@ -32,49 +29,12 @@ export const SettingsScreen = () => {
   const {
     budget,
     currency,
-    lockSettings,
     updateBudget,
     updateCurrency,
-    updateLockSettings,
     resetAllExpenses,
   } = useExpense();
 
   const [isBudgetModalVisible, setIsBudgetModalVisible] = useState(false);
-  const [biometricInfo, setBiometricInfo] = useState({ available: false, biometricType: 'Biometrics' });
-  const [isPinModalVisible, setIsPinModalVisible] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-
-  useEffect(() => {
-    checkBiometricsAvailable().then(setBiometricInfo);
-  }, []);
-
-  const handleToggleLock = (enabled) => {
-    if (enabled && !lockSettings.pin) {
-      setIsPinModalVisible(true);
-    } else {
-      updateLockSettings({
-        ...lockSettings,
-        isEnabled: enabled,
-      });
-    }
-  };
-
-  const handleSavePin = () => {
-    if (pinInput.length !== 4) {
-      Alert.alert('Invalid PIN', 'Please enter a 4-digit numeric PIN.');
-      return;
-    }
-
-    updateLockSettings({
-      isEnabled: true,
-      pin: pinInput,
-      useBiometrics: biometricInfo.available,
-    });
-
-    setIsPinModalVisible(false);
-    setPinInput('');
-    Alert.alert('App Lock Activated', `SereneSpend is now protected by ${biometricInfo.biometricType} and your 4-digit PIN.`);
-  };
 
   const handleResetData = () => {
     Alert.alert(
@@ -103,9 +63,9 @@ export const SettingsScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Settings & Privacy</Text>
+          <Text style={styles.title}>Settings</Text>
           <Text style={styles.subtitle}>
-            Manage budget limits, currency, and biometric privacy.
+            Manage budget limits, currency, and local data.
           </Text>
         </View>
 
@@ -159,52 +119,6 @@ export const SettingsScreen = () => {
           </View>
         </Card>
 
-        <Text style={styles.groupTitle}>SECURITY & PRIVACY</Text>
-        <Card style={styles.card}>
-          <View style={styles.settingRow}>
-            <View style={styles.settingLeft}>
-              <View style={[styles.iconCircle, { backgroundColor: '#F0EFF8' }]}>
-                <MaterialIcons name="lock" size={20} color={THEME.colors.catEntertainment} />
-              </View>
-              <View style={{ flex: 1, paddingRight: 8 }}>
-                <Text style={styles.settingTitle}>App Lock (Biometrics & PIN)</Text>
-                <Text style={styles.settingSubtitle}>
-                  {biometricInfo.available
-                    ? `Protect with ${biometricInfo.biometricType} or 4-digit PIN.`
-                    : 'Protect with 4-digit PIN.'}
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={lockSettings.isEnabled}
-              onValueChange={handleToggleLock}
-              trackColor={{ false: THEME.colors.border, true: THEME.colors.primary }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-
-          {lockSettings.isEnabled && (
-            <>
-              <View style={styles.divider} />
-              <TouchableOpacity
-                style={styles.settingRow}
-                onPress={() => setIsPinModalVisible(true)}
-              >
-                <View style={styles.settingLeft}>
-                  <View style={[styles.iconCircle, { backgroundColor: THEME.colors.surfaceSecondary }]}>
-                    <MaterialIcons name="pin" size={20} color={THEME.colors.textSecondary} />
-                  </View>
-                  <View>
-                    <Text style={styles.settingTitle}>Change 4-Digit PIN</Text>
-                    <Text style={styles.settingSubtitle}>Update your fallback security PIN</Text>
-                  </View>
-                </View>
-                <MaterialIcons name="chevron-right" size={22} color={THEME.colors.textMuted} />
-              </TouchableOpacity>
-            </>
-          )}
-        </Card>
-
         <Text style={styles.groupTitle}>DATA MANAGEMENT</Text>
         <Card style={styles.card}>
           <TouchableOpacity
@@ -247,52 +161,6 @@ export const SettingsScreen = () => {
         onClose={() => setIsBudgetModalVisible(false)}
         onSave={updateBudget}
       />
-
-      {isPinModalVisible && (
-        <View style={styles.pinModalOverlay}>
-          <View style={styles.pinModalContent}>
-            <View style={styles.pinModalHeader}>
-              <View style={styles.pinModalIconWrap}>
-                <MaterialIcons name="lock-outline" size={24} color={THEME.colors.primary} />
-              </View>
-              <Text style={styles.pinModalTitle}>Set 4-Digit Security PIN</Text>
-              <Text style={styles.pinModalSub}>
-                Enter a 4-digit code to unlock the app when biometrics are unavailable.
-              </Text>
-            </View>
-
-            <TextInput
-              style={styles.pinInputField}
-              value={pinInput}
-              onChangeText={setPinInput}
-              keyboardType="number-pad"
-              maxLength={4}
-              secureTextEntry
-              autoFocus
-              placeholder="••••"
-              placeholderTextColor={THEME.colors.textMuted}
-            />
-
-            <View style={styles.pinModalActions}>
-              <TouchableOpacity
-                style={styles.pinCancelBtn}
-                onPress={() => {
-                  setIsPinModalVisible(false);
-                  setPinInput('');
-                }}
-              >
-                <Text style={styles.pinCancelText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.pinSaveBtn}
-                onPress={handleSavePin}
-              >
-                <Text style={styles.pinSaveText}>Save PIN</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      )}
     </SafeAreaView>
   );
 };
@@ -421,87 +289,5 @@ const styles = StyleSheet.create({
   aboutSub: {
     fontSize: 11,
     color: THEME.colors.textMuted,
-  },
-  pinModalOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(30, 44, 34, 0.4)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: THEME.spacing.lg,
-    zIndex: 9999,
-  },
-  pinModalContent: {
-    width: '100%',
-    maxWidth: 320,
-    backgroundColor: THEME.colors.surface,
-    borderRadius: THEME.borderRadius.xl,
-    padding: THEME.spacing.xl,
-    ...THEME.shadows.floating,
-  },
-  pinModalHeader: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  pinModalIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: THEME.colors.primaryLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  pinModalTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: THEME.colors.textPrimary,
-    marginBottom: 4,
-  },
-  pinModalSub: {
-    fontSize: 12,
-    color: THEME.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  pinInputField: {
-    backgroundColor: THEME.colors.surfaceSecondary,
-    borderRadius: THEME.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-    paddingVertical: 12,
-    textAlign: 'center',
-    fontSize: 28,
-    letterSpacing: 10,
-    fontWeight: '700',
-    color: THEME.colors.textPrimary,
-    marginBottom: 20,
-  },
-  pinModalActions: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  pinCancelBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: THEME.borderRadius.lg,
-    backgroundColor: THEME.colors.surfaceSecondary,
-    alignItems: 'center',
-  },
-  pinCancelText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: THEME.colors.textSecondary,
-  },
-  pinSaveBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: THEME.borderRadius.lg,
-    backgroundColor: THEME.colors.primary,
-    alignItems: 'center',
-  },
-  pinSaveText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
 });

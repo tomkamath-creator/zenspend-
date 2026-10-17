@@ -15,14 +15,11 @@ import { THEME } from '../constants/theme';
 import { getCategoryById } from '../constants/categories';
 import { useExpense } from '../context/ExpenseContext';
 import { exportExpensesToCSV } from '../services/csvService';
-import { printExpenseReport, exportExpenseReportPDF } from '../services/pdfService';
 import { Card } from '../components/Card';
 
 export const ReportsScreen = () => {
-  const { expenses, budget, currency, metrics } = useExpense();
+  const { expenses, currency, metrics } = useExpense();
   const [isExportingCSV, setIsExportingCSV] = useState(false);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [isPrinting, setIsPrinting] = useState(false);
 
   const now = new Date();
   const monthName = now.toLocaleString('default', { month: 'long' });
@@ -41,52 +38,6 @@ export const ReportsScreen = () => {
       Alert.alert('Export Failed', 'Could not export CSV file.');
     } finally {
       setIsExportingCSV(false);
-    }
-  };
-
-  const handlePrintPDF = async () => {
-    if (expenses.length === 0) {
-      Alert.alert('No Records', 'Add some expenses before printing a report.');
-      return;
-    }
-
-    setIsPrinting(true);
-    try {
-      await printExpenseReport({
-        expenses,
-        monthlyBudget: budget,
-        currencySymbol: currency,
-        monthName,
-        year,
-        metrics,
-      });
-    } catch (error) {
-      Alert.alert('Print Failed', 'Could not initiate printing.');
-    } finally {
-      setIsPrinting(false);
-    }
-  };
-
-  const handleSharePDF = async () => {
-    if (expenses.length === 0) {
-      Alert.alert('No Records', 'Add some expenses before generating a report.');
-      return;
-    }
-
-    setIsGeneratingPDF(true);
-    try {
-      await exportExpenseReportPDF({
-        expenses,
-        monthlyBudget: budget,
-        currencySymbol: currency,
-        monthName,
-        year,
-        metrics,
-      });
-    } catch (error) {
-      Alert.alert('PDF Export Failed', 'Could not save PDF file.');
-    } finally {
-      setIsGeneratingPDF(false);
     }
   };
 
@@ -113,67 +64,19 @@ export const ReportsScreen = () => {
         <View style={styles.header}>
           <Text style={styles.title}>Reports & Exports</Text>
           <Text style={styles.subtitle}>
-            Offline printable statements and spreadsheet backups.
+            Offline financial analytics and spreadsheet backup.
           </Text>
         </View>
 
         <Card style={styles.actionCard}>
           <View style={styles.cardHeader}>
-            <View style={styles.iconCircle}>
-              <MaterialIcons name="picture-as-pdf" size={22} color={THEME.colors.primary} />
-            </View>
-            <View style={styles.cardHeaderInfo}>
-              <Text style={styles.cardTitle}>Printable PDF Reports</Text>
-              <Text style={styles.cardSubtitle}>
-                Generate a formal {monthName} financial statement with breakdown charts.
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.pdfButtonsRow}>
-            <TouchableOpacity
-              style={styles.pdfPrimaryBtn}
-              onPress={handleSharePDF}
-              disabled={isGeneratingPDF}
-              activeOpacity={0.8}
-            >
-              {isGeneratingPDF ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <>
-                  <MaterialIcons name="file-download" size={18} color="#FFFFFF" />
-                  <Text style={styles.pdfPrimaryBtnText}>Save / Share PDF</Text>
-                </>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.pdfSecondaryBtn}
-              onPress={handlePrintPDF}
-              disabled={isPrinting}
-              activeOpacity={0.7}
-            >
-              {isPrinting ? (
-                <ActivityIndicator size="small" color={THEME.colors.primary} />
-              ) : (
-                <>
-                  <MaterialIcons name="print" size={18} color={THEME.colors.primary} />
-                  <Text style={styles.pdfSecondaryBtnText}>Print Directly</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          </View>
-        </Card>
-
-        <Card style={styles.actionCard}>
-          <View style={styles.cardHeader}>
             <View style={[styles.iconCircle, { backgroundColor: '#EFF5EF' }]}>
-              <MaterialIcons name="table-chart" size={22} color={THEME.colors.catGroceries} />
+              <MaterialIcons name="table-chart" size={24} color={THEME.colors.catGroceries} />
             </View>
             <View style={styles.cardHeaderInfo}>
               <Text style={styles.cardTitle}>Spreadsheet Export (CSV)</Text>
               <Text style={styles.cardSubtitle}>
-                One-tap export of all {expenses.length} records. Open directly in Excel, Numbers, or Sheets.
+                Export all {expenses.length} records into a spreadsheet file directly on your phone. Opens in Excel, Numbers, and Google Sheets.
               </Text>
             </View>
           </View>
@@ -188,12 +91,35 @@ export const ReportsScreen = () => {
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <>
-                <MaterialIcons name="ios-share" size={18} color="#FFFFFF" />
+                <MaterialIcons name="file-download" size={20} color="#FFFFFF" />
                 <Text style={styles.csvExportBtnText}>Export All Records to CSV</Text>
               </>
             )}
           </TouchableOpacity>
         </Card>
+
+        <View style={styles.metricsSummaryCard}>
+          <View style={styles.metricItem}>
+            <Text style={styles.metricLabel}>{monthName} Total</Text>
+            <Text style={styles.metricVal}>
+              {currency}{metrics.totalThisMonth.toFixed(2)}
+            </Text>
+          </View>
+          <View style={styles.metricDivider} />
+          <View style={styles.metricItem}>
+            <Text style={styles.metricLabel}>{year} Total</Text>
+            <Text style={styles.metricVal}>
+              {currency}{metrics.totalThisYear.toFixed(2)}
+            </Text>
+          </View>
+          <View style={styles.metricDivider} />
+          <View style={styles.metricItem}>
+            <Text style={styles.metricLabel}>Daily Allowance</Text>
+            <Text style={[styles.metricVal, { color: THEME.colors.primary }]}>
+              {currency}{metrics.safeDailyAllowance.toFixed(2)}
+            </Text>
+          </View>
+        </View>
 
         <View style={styles.categorySection}>
           <Text style={styles.sectionTitle}>Category Spending Breakdown</Text>
@@ -230,7 +156,7 @@ export const ReportsScreen = () => {
                 </View>
 
                 <Text style={styles.categoryPercentage}>
-                  {item.percentage.toFixed(1)}% of total spending
+                  {item.percentage.toFixed(1)}% of month's spending
                 </Text>
               </Card>
             ))
@@ -238,9 +164,9 @@ export const ReportsScreen = () => {
         </View>
 
         <View style={styles.privacyCard}>
-          <MaterialIcons name="security" size={18} color={THEME.colors.primary} />
+          <MaterialIcons name="verified-user" size={18} color={THEME.colors.primary} />
           <Text style={styles.privacyText}>
-            All statements and exports are compiled on your phone's processor. Zero internet required.
+            100% Offline. All calculations and exports run locally on your phone. Zero cloud fees.
           </Text>
         </View>
       </ScrollView>
@@ -273,6 +199,7 @@ const styles = StyleSheet.create({
   },
   actionCard: {
     marginBottom: THEME.spacing.lg,
+    padding: THEME.spacing.lg,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -283,7 +210,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: THEME.colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -302,51 +228,14 @@ const styles = StyleSheet.create({
     color: THEME.colors.textSecondary,
     lineHeight: 16,
   },
-  pdfButtonsRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  pdfPrimaryBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: THEME.colors.primary,
-    paddingVertical: 12,
-    borderRadius: THEME.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    ...THEME.shadows.card,
-  },
-  pdfPrimaryBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  pdfSecondaryBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: THEME.colors.surfaceSecondary,
-    paddingVertical: 12,
-    borderRadius: THEME.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-  },
-  pdfSecondaryBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: THEME.colors.primary,
-  },
   csvExportBtn: {
     flexDirection: 'row',
-    backgroundColor: THEME.colors.catGroceries,
-    paddingVertical: 13,
+    backgroundColor: THEME.colors.primary,
+    paddingVertical: 14,
     borderRadius: THEME.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
     ...THEME.shadows.card,
   },
   csvExportBtnText: {
@@ -354,8 +243,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
+  metricsSummaryCard: {
+    flexDirection: 'row',
+    backgroundColor: THEME.colors.surface,
+    borderRadius: THEME.borderRadius.xl,
+    padding: THEME.spacing.md,
+    marginBottom: THEME.spacing.lg,
+    ...THEME.shadows.card,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+  },
+  metricItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  metricDivider: {
+    width: 1,
+    backgroundColor: THEME.colors.borderSubtle,
+  },
+  metricLabel: {
+    fontSize: 11,
+    color: THEME.colors.textMuted,
+    marginBottom: 4,
+    fontWeight: '500',
+  },
+  metricVal: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: THEME.colors.textPrimary,
+  },
   categorySection: {
-    marginTop: THEME.spacing.sm,
     marginBottom: THEME.spacing.lg,
   },
   sectionTitle: {
