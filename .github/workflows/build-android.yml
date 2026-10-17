@@ -1,0 +1,114 @@
+name: Build Android APK (SereneSpend)
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+          - debug
+          - release
+
+jobs:
+  validate:
+    name: 🔍 Validate & Bundle Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Verify Expo Project Integrity
+        run: npx expo-doctor
+
+      - name: Test JavaScript Bundling
+        run: npx expo export --no-bytecode
+
+  build-apk:
+    name: 📱 Build Installable Android APK
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Setup Java (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Prebuild Native Android Project
+        run: npx expo prebuild --platform android --clean
+
+      - name: Make Gradle Executable
+        run: chmod +x android/gradlew
+
+      - name: Build Android APK with Gradle
+        run: |
+          cd android
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Locate & Rename APK
+        run: |
+          mkdir -p output
+          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
+          if [ -f "$APK_PATH" ]; then
+            cp "$APK_PATH" output/SereneSpend.apk
+            echo "APK generated successfully at output/SereneSpend.apk"
+          else
+            echo "Error: APK file not found!"
+            exit 1
+          fi
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SereneSpend-Android-APK
+          path: output/SereneSpend.apk
+          retention-days: 14
+
+      - name: Create GitHub Release (On Tag Push)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: output/SereneSpend.apk
+          name: SereneSpend Release ${{ github.ref_name }}
+          body: |
+            ## 🌿 SereneSpend Mobile App Release
+            - 100% Offline Expense Tracker & Budget Calculator
+            - No cloud servers, no accounts, no subscriptions.
+            - **Installation:** Download `SereneSpend.apk` directly to your phone and install.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

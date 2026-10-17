@@ -1,24 +1,54 @@
 {
   "expo": {
-    "name": "expence",
-    "slug": "expence",
+    "name": "SereneSpend",
+    "slug": "serenespend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "SereneSpend uses your camera strictly offline to photograph receipts and bills.",
+        "NSPhotoLibraryUsageDescription": "SereneSpend accesses your gallery strictly offline to scan receipt screenshots.",
+        "NSFaceIDUsageDescription": "SereneSpend uses Face ID to keep your financial records private."
+      }
     },
     "android": {
+      "package": "com.serenespend.offlinetracker",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#F6F8F5",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-sharing",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "SereneSpend accesses your photos strictly offline to attach receipt screenshots.",
+          "cameraPermission": "SereneSpend uses your camera strictly offline to photograph paper bills."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow SereneSpend to use Face ID for privacy lock."
+        }
+      ]
+    ]
   }
 }
