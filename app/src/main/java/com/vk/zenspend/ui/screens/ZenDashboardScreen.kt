@@ -337,7 +337,7 @@ private fun MiniMetricBox(
 
     Box(
         modifier = modifier
-            .clip(ZenCardBorder.run { CircleShape })
+            .clip(RoundedCornerShape(20.dp))
             .background(bgColor)
             .padding(horizontal = 14.dp, vertical = 10.dp)
     ) {

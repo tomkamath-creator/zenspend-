@@ -3,6 +3,7 @@ package com.vk.zenspend.ui.theme
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
+import androidx.compose.ui.unit.IntOffset
 
 /**
  * Zen Spend Motion Language:
@@ -11,6 +12,11 @@ import androidx.compose.animation.core.spring
  */
 object ZenMotion {
     val DefaultSpring = spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessLow
+    )
+
+    val IntOffsetSpring = spring<IntOffset>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
         stiffness = Spring.StiffnessLow
     )

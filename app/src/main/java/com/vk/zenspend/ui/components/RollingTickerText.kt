@@ -45,11 +45,11 @@ fun RollingTickerText(
                 targetState = char,
                 transitionSpec = {
                     if (targetState > initialState) {
-                        slideInVertically(animationSpec = ZenMotion.DefaultSpring) { height -> height } togetherWith
-                                slideOutVertically(animationSpec = ZenMotion.DefaultSpring) { height -> -height }
+                        slideInVertically(animationSpec = ZenMotion.IntOffsetSpring) { height -> height } togetherWith
+                                slideOutVertically(animationSpec = ZenMotion.IntOffsetSpring) { height -> -height }
                     } else {
-                        slideInVertically(animationSpec = ZenMotion.DefaultSpring) { height -> -height } togetherWith
-                                slideOutVertically(animationSpec = ZenMotion.DefaultSpring) { height -> height }
+                        slideInVertically(animationSpec = ZenMotion.IntOffsetSpring) { height -> -height } togetherWith
+                                slideOutVertically(animationSpec = ZenMotion.IntOffsetSpring) { height -> height }
                     }
                 },
                 label = "odometer_digit_$index"
