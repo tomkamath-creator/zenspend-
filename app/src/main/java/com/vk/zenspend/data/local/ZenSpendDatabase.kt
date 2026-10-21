@@ -12,6 +12,8 @@ import com.vk.zenspend.data.local.entity.BudgetEntity
 import com.vk.zenspend.data.local.entity.CategoryEntity
 import com.vk.zenspend.data.local.entity.DebtEntity
 import com.vk.zenspend.data.local.entity.TransactionEntity
+import com.vk.zenspend.data.local.dao.EmiDao
+import com.vk.zenspend.data.local.entity.EmiEntity
 import com.vk.zenspend.domain.model.TransactionType
 
 @Database(
@@ -19,9 +21,10 @@ import com.vk.zenspend.domain.model.TransactionType
         TransactionEntity::class,
         CategoryEntity::class,
         BudgetEntity::class,
-        DebtEntity::class
+        DebtEntity::class,
+        EmiEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -31,6 +34,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
     abstract fun budgetDao(): BudgetDao
     abstract fun debtDao(): DebtDao
+    abstract fun emiDao(): EmiDao
 
     companion object {
         const val DATABASE_NAME = "zenspend.db"

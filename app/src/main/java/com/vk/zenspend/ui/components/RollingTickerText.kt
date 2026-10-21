@@ -26,7 +26,7 @@ import java.util.Locale
 fun RollingTickerText(
     amount: Double,
     modifier: Modifier = Modifier,
-    currencySymbol: String = "$",
+    currencySymbol: String = "₹",
     textStyle: TextStyle = TextStyle(
         fontSize = 32.sp,
         fontWeight = FontWeight.Bold,

@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.zenspend.domain.model.Budget
 import com.vk.zenspend.domain.model.Category
+import com.vk.zenspend.domain.model.Emi
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.domain.repository.BudgetRepository
 import com.vk.zenspend.domain.repository.CategoryRepository
 import com.vk.zenspend.domain.repository.DebtRepository
+import com.vk.zenspend.domain.repository.EmiRepository
 import com.vk.zenspend.domain.repository.TransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +32,8 @@ class ZenSpendViewModel @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val categoryRepository: CategoryRepository,
     private val budgetRepository: BudgetRepository,
-    private val debtRepository: DebtRepository
+    private val debtRepository: DebtRepository,
+    private val emiRepository: EmiRepository
 ) : ViewModel() {
 
     // 1-second splash screen control
@@ -57,7 +60,7 @@ class ZenSpendViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    // Current month calculations
+    // Current month start & end timestamps
     private val calendar = Calendar.getInstance()
     private val currentMonth = calendar.get(Calendar.MONTH) + 1
     private val currentYear = calendar.get(Calendar.YEAR)
@@ -104,12 +107,12 @@ class ZenSpendViewModel @Inject constructor(
 
     val monthlyBudgetAmount: StateFlow<Double> = currentBudget
         .combine(totalExpensesThisMonth) { budget, _ ->
-            budget?.totalMonthlyBudget ?: 2500.0 // Default calm target of $2500
+            budget?.totalMonthlyBudget ?: 25000.0 // Default calm target of ₹25,000
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 2500.0
+            initialValue = 25000.0
         )
 
     val remainingDaysInMonth: Int = run {
@@ -119,7 +122,7 @@ class ZenSpendViewModel @Inject constructor(
         max(1, totalDays - currentDay + 1)
     }
 
-    // Daily Calm Allowance: Remaining safe money divided by remaining days
+    // Daily Calm Allowance in ₹
     val dailyCalmAllowance: StateFlow<Double> = combine(
         monthlyBudgetAmount,
         totalExpensesThisMonth
@@ -129,25 +132,52 @@ class ZenSpendViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 2500.0 / remainingDaysInMonth
+        initialValue = 25000.0 / remainingDaysInMonth
+    )
+
+    // EMIs
+    val emis: StateFlow<List<Emi>> = emiRepository
+        .getAllEmis()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val totalMonthlyEmiBurden: StateFlow<Double> = emiRepository
+        .getTotalMonthlyEmiBurden()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0.0
+        )
+
+    // Search & Filter
+    val searchQuery = MutableStateFlow("")
+
+    val filteredTransactions: StateFlow<List<Transaction>> = combine(
+        transactions,
+        searchQuery
+    ) { txList, query ->
+        if (query.isBlank()) {
+            txList
+        } else {
+            txList.filter {
+                it.title.contains(query, ignoreCase = true) ||
+                        it.categoryName.contains(query, ignoreCase = true) ||
+                        (it.note?.contains(query, ignoreCase = true) == true)
+            }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
     )
 
     // Group transactions by date headers: "Today", "Yesterday", or "Oct 21"
-    val groupedTransactions: StateFlow<Map<String, List<Transaction>>> = transactions
-        .combine(totalExpensesThisMonth) { txList, _ ->
-            val todayCal = Calendar.getInstance()
-            val txCal = Calendar.getInstance()
-            val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-
-            txList.groupBy { tx ->
-                txCal.timeInMillis = tx.timestamp
-                when {
-                    isSameDay(todayCal, txCal) -> "Today"
-                    isYesterday(todayCal, txCal) -> "Yesterday"
-                    else -> dateFormat.format(Date(tx.timestamp))
-                }
-            }
-        }.stateIn(
+    val groupedTransactions: StateFlow<Map<String, List<Transaction>>> = filteredTransactions
+        .mapGroupedByDate()
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyMap()
@@ -175,6 +205,62 @@ class ZenSpendViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    fun addEmi(emi: Emi) {
+        viewModelScope.launch {
+            emiRepository.insertEmi(emi)
+        }
+    }
+
+    fun deleteEmi(emi: Emi) {
+        viewModelScope.launch {
+            emiRepository.deleteEmi(emi)
+        }
+    }
+
+    fun toggleEmiPaid(emi: Emi) {
+        viewModelScope.launch {
+            val newStatus = !emi.isPaidThisMonth
+            emiRepository.setEmiPaidStatus(emi.id, newStatus)
+            // If marked as paid, automatically log this EMI as an expense transaction!
+            if (newStatus) {
+                transactionRepository.insertTransaction(
+                    Transaction(
+                        title = "EMI: ${emi.title}",
+                        amount = emi.monthlyAmount,
+                        type = TransactionType.EXPENSE,
+                        categoryId = "calm_essentials",
+                        categoryName = "Calm Essentials",
+                        categoryIcon = "Payments",
+                        categoryColor = 0xFFED8936L,
+                        timestamp = System.currentTimeMillis(),
+                        note = "Automatic EMI payment logged"
+                    )
+                )
+            }
+        }
+    }
+
+    private fun StateFlow<List<Transaction>>.mapGroupedByDate(): StateFlow<Map<String, List<Transaction>>> {
+        return combine(this, totalExpensesThisMonth) { txList, _ ->
+            val todayCal = Calendar.getInstance()
+            val txCal = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+
+            txList.groupBy { tx ->
+                txCal.timeInMillis = tx.timestamp
+                when {
+                    isSameDay(todayCal, txCal) -> "Today"
+                    isYesterday(todayCal, txCal) -> "Yesterday"
+                    else -> dateFormat.format(Date(tx.timestamp))
+                }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap()
+        )
     }
 
     private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {

@@ -1,0 +1,175 @@
+package com.vk.zenspend.ui.screens
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.SagePastel
+import com.vk.zenspend.ui.theme.SagePrimary
+import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenMotion
+import com.vk.zenspend.ui.theme.ZenPillShape
+import com.vk.zenspend.ui.theme.ZenTextMuted
+import com.vk.zenspend.ui.theme.ZenTextSecondary
+
+/**
+ * Main App Container with Crystal-Clear Bottom Navigation:
+ * Tab 0: Home (Zen Dashboard & Daily Calm Allowance Gauge)
+ * Tab 1: Expenses (Search, Filter, Full Ledger, Attached Bills)
+ * Tab 2: Budget & EMI (Set Monthly Budget Limit & EMI / Loan Tracker)
+ */
+@Composable
+fun MainAppScaffold(
+    viewModel: ZenSpendViewModel
+) {
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    val haptic = LocalHapticFeedback.current
+
+    Scaffold(
+        containerColor = PorcelainBg,
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(elevation = 10.dp, shape = RoundedCornerShape(26.dp), ambientColor = Color.Black.copy(alpha = 0.08f))
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(Color.White)
+                        .border(1.dp, ZenCardBorder.copy(alpha = 0.8f), RoundedCornerShape(26.dp))
+                        .padding(horizontal = 8.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    NavTabItem(
+                        icon = Icons.Default.Home,
+                        label = "Home",
+                        isSelected = selectedTab == 0
+                    ) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        selectedTab = 0
+                    }
+
+                    NavTabItem(
+                        icon = Icons.Default.ReceiptLong,
+                        label = "Expenses",
+                        isSelected = selectedTab == 1
+                    ) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        selectedTab = 1
+                    }
+
+                    NavTabItem(
+                        icon = Icons.Default.AccountBalanceWallet,
+                        label = "Budget & EMI",
+                        isSelected = selectedTab == 2
+                    ) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        selectedTab = 2
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .statusBarsPadding()
+        ) {
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = {
+                    fadeIn(animationSpec = ZenMotion.DefaultSpring) togetherWith
+                            fadeOut(animationSpec = ZenMotion.DefaultSpring)
+                },
+                label = "tabTransition"
+            ) { tab ->
+                when (tab) {
+                    0 -> ZenDashboardScreen(viewModel = viewModel)
+                    1 -> ExpensesLedgerScreen(viewModel = viewModel)
+                    2 -> BudgetAndEmiScreen(viewModel = viewModel)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NavTabItem(
+    icon: ImageVector,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val bgColor = if (isSelected) SagePastel else Color.Transparent
+    val contentColor = if (isSelected) SagePrimary else ZenTextMuted
+
+    Row(
+        modifier = Modifier
+            .clip(ZenPillShape)
+            .background(bgColor)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = contentColor,
+            modifier = Modifier.size(20.dp)
+        )
+        if (isSelected) {
+            Text(
+                text = label,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                color = contentColor,
+                modifier = Modifier.padding(start = 6.dp)
+            )
+        }
+    }
+}

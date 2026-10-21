@@ -13,12 +13,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,9 +26,9 @@ import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 
 /**
- * Zen Logo • Crafted by VK
- * Renders a soothing, balanced Zen cairn (stacked stones)
- * crowned with a golden prosperity bud and subtle VK monogram.
+ * Zen Expense Calculator Logo
+ * Features a modern rounded calculator card, golden Indian Rupee '₹' display,
+ * keypad dots, and a gentle water-drop circular halo.
  */
 @Composable
 fun ZenLogo(
@@ -40,145 +38,148 @@ fun ZenLogo(
     Box(
         modifier = modifier
             .size(size)
-            .shadow(elevation = 6.dp, shape = CircleShape, ambientColor = SageAccent.copy(alpha = 0.2f))
+            .shadow(elevation = 6.dp, shape = CircleShape, ambientColor = SageAccent.copy(alpha = 0.25f))
             .clip(CircleShape)
             .background(
                 Brush.radialGradient(
                     colors = listOf(
                         Color(0xFFFFFFFF),
-                        SagePastel.copy(alpha = 0.7f),
+                        SagePastel.copy(alpha = 0.8f),
                         PorcelainBg
                     )
                 )
             ),
         contentAlignment = Alignment.Center
     ) {
-        Canvas(modifier = Modifier.size(size * 0.75f)) {
+        Canvas(modifier = Modifier.size(size * 0.72f)) {
             val w = this.size.width
             val h = this.size.height
 
-            // 1. Golden Accent Halo
+            // 1. Water Ripple Halo
             drawCircle(
-                color = Color(0xFFFFB703).copy(alpha = 0.35f),
-                radius = w * 0.46f,
+                color = SageAccent.copy(alpha = 0.25f),
+                radius = w * 0.48f,
                 center = Offset(w / 2f, h / 2f),
                 style = Stroke(width = w * 0.02f)
             )
 
-            // 2. Base Large Zen Stone (Forest Emerald)
-            val baseStone = RoundRect(
-                left = w * 0.18f,
-                top = h * 0.64f,
-                right = w * 0.82f,
-                bottom = h * 0.80f,
-                cornerRadius = CornerRadius(w * 0.08f, h * 0.08f)
+            // 2. Calculator Body (Forest Sage Gradient)
+            val calcBody = RoundRect(
+                left = w * 0.20f,
+                top = h * 0.16f,
+                right = w * 0.80f,
+                bottom = h * 0.88f,
+                cornerRadius = CornerRadius(w * 0.10f, h * 0.10f)
             )
-            val basePath = Path().apply { addRoundRect(baseStone) }
+            val calcPath = Path().apply { addRoundRect(calcBody) }
             drawPath(
-                path = basePath,
-                brush = Brush.horizontalGradient(
+                path = calcPath,
+                brush = Brush.verticalGradient(
                     colors = listOf(Color(0xFF1B4332), SagePrimary)
                 )
             )
 
-            // 3. Middle-Low Stone (Deep Sage)
-            val midLowStone = RoundRect(
+            // 3. Digital Screen Bar
+            val screenRect = RoundRect(
                 left = w * 0.26f,
-                top = h * 0.49f,
+                top = h * 0.22f,
                 right = w * 0.74f,
-                bottom = h * 0.63f,
-                cornerRadius = CornerRadius(w * 0.07f, h * 0.07f)
-            )
-            val midLowPath = Path().apply { addRoundRect(midLowStone) }
-            drawPath(
-                path = midLowPath,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(SagePrimary, Color(0xFF40916C))
-                )
-            )
-
-            // 4. Middle-Top Stone (Fresh Sage)
-            val midTopStone = RoundRect(
-                left = w * 0.33f,
-                top = h * 0.36f,
-                right = w * 0.67f,
-                bottom = h * 0.48f,
-                cornerRadius = CornerRadius(w * 0.06f, h * 0.06f)
-            )
-            val midTopPath = Path().apply { addRoundRect(midTopStone) }
-            drawPath(
-                path = midTopPath,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(Color(0xFF40916C), SageAccent)
-                )
-            )
-
-            // 5. Crown Stone (Soft Mint)
-            val capStone = RoundRect(
-                left = w * 0.40f,
-                top = h * 0.26f,
-                right = w * 0.60f,
-                bottom = h * 0.35f,
+                bottom = h * 0.40f,
                 cornerRadius = CornerRadius(w * 0.05f, h * 0.05f)
             )
-            val capPath = Path().apply { addRoundRect(capStone) }
             drawPath(
-                path = capPath,
-                brush = Brush.horizontalGradient(
-                    colors = listOf(Color(0xFF52B788), Color(0xFF74C69D))
-                )
+                path = Path().apply { addRoundRect(screenRect) },
+                color = Color(0xFFE8F5E9)
             )
 
-            // 6. Golden Prosperity Sprout / Bud
-            val budPath = Path().apply {
-                moveTo(w * 0.50f, h * 0.12f)
-                cubicTo(w * 0.54f, h * 0.16f, w * 0.57f, h * 0.22f, w * 0.50f, h * 0.25f)
-                cubicTo(w * 0.43f, h * 0.22f, w * 0.46f, h * 0.16f, w * 0.50f, h * 0.12f)
-                close()
+            // 4. Golden Rupee '₹' Glyph on Screen
+            val rupeeTopY = h * 0.27f
+            val rupeeMidY = h * 0.32f
+            val rupeeBotY = h * 0.38f
+            val strokeW = w * 0.024f
+            val gold = Color(0xFFFFB703)
+
+            // Top Bar
+            drawLine(
+                color = gold,
+                start = Offset(w * 0.32f, rupeeTopY),
+                end = Offset(w * 0.44f, rupeeTopY),
+                strokeWidth = strokeW,
+                cap = StrokeCap.Round
+            )
+            // Second Bar
+            drawLine(
+                color = gold,
+                start = Offset(w * 0.32f, rupeeTopY + (rupeeMidY - rupeeTopY) * 0.5f),
+                end = Offset(w * 0.42f, rupeeTopY + (rupeeMidY - rupeeTopY) * 0.5f),
+                strokeWidth = strokeW,
+                cap = StrokeCap.Round
+            )
+            // Arc / Stem
+            val rupeeArc = Path().apply {
+                moveTo(w * 0.36f, rupeeTopY)
+                cubicTo(w * 0.44f, rupeeTopY, w * 0.44f, rupeeMidY, w * 0.36f, rupeeMidY)
+                lineTo(w * 0.35f, rupeeMidY)
+                lineTo(w * 0.43f, rupeeBotY)
             }
             drawPath(
-                path = budPath,
-                color = Color(0xFFFFB703)
+                path = rupeeArc,
+                color = gold,
+                style = Stroke(width = strokeW, cap = StrokeCap.Round)
             )
 
-            // 7. Minimalist VK Monogram in the Base Stone
-            val strokeWidth = w * 0.024f
-            // 'V'
+            // Digital balance line
             drawLine(
-                color = Color.White.copy(alpha = 0.95f),
-                start = Offset(w * 0.42f, h * 0.69f),
-                end = Offset(w * 0.46f, h * 0.76f),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
-            )
-            drawLine(
-                color = Color.White.copy(alpha = 0.95f),
-                start = Offset(w * 0.46f, h * 0.76f),
-                end = Offset(w * 0.50f, h * 0.69f),
-                strokeWidth = strokeWidth,
+                color = SagePrimary,
+                start = Offset(w * 0.48f, h * 0.32f),
+                end = Offset(w * 0.68f, h * 0.32f),
+                strokeWidth = strokeW * 1.2f,
                 cap = StrokeCap.Round
             )
 
-            // 'K'
+            // 5. Calculator Keypad Grid
+            val keyColor = Color(0xFF52B788)
+            val accentKey = Color(0xFFFFB703)
+            val row1Y = h * 0.49f
+            val row2Y = h * 0.62f
+            val colXs = listOf(w * 0.33f, w * 0.45f, w * 0.57f, w * 0.69f)
+
+            // Row 1
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[0], row1Y))
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[1], row1Y))
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[2], row1Y))
+            drawCircle(accentKey, radius = w * 0.045f, center = Offset(colXs[3], row1Y))
+
+            // Row 2
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[0], row2Y))
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[1], row2Y))
+            drawCircle(keyColor, radius = w * 0.045f, center = Offset(colXs[2], row2Y))
+            drawCircle(accentKey, radius = w * 0.045f, center = Offset(colXs[3], row2Y))
+
+            // Equal Bar at bottom
+            val equalBar = RoundRect(
+                left = w * 0.28f,
+                top = h * 0.72f,
+                right = w * 0.72f,
+                bottom = h * 0.81f,
+                cornerRadius = CornerRadius(w * 0.04f, h * 0.04f)
+            )
+            drawPath(
+                path = Path().apply { addRoundRect(equalBar) },
+                color = Color(0xFF74C69D)
+            )
             drawLine(
-                color = Color.White.copy(alpha = 0.95f),
-                start = Offset(w * 0.53f, h * 0.69f),
-                end = Offset(w * 0.53f, h * 0.76f),
-                strokeWidth = strokeWidth,
+                color = Color.White,
+                start = Offset(w * 0.44f, h * 0.755f),
+                end = Offset(w * 0.56f, h * 0.755f),
+                strokeWidth = strokeW * 0.9f,
                 cap = StrokeCap.Round
             )
             drawLine(
-                color = Color.White.copy(alpha = 0.95f),
-                start = Offset(w * 0.58f, h * 0.69f),
-                end = Offset(w * 0.53f, h * 0.725f),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
-            )
-            drawLine(
-                color = Color.White.copy(alpha = 0.95f),
-                start = Offset(w * 0.53f, h * 0.725f),
-                end = Offset(w * 0.58f, h * 0.76f),
-                strokeWidth = strokeWidth,
+                color = Color.White,
+                start = Offset(w * 0.44f, h * 0.785f),
+                end = Offset(w * 0.56f, h * 0.785f),
+                strokeWidth = strokeW * 0.9f,
                 cap = StrokeCap.Round
             )
         }

@@ -1,6 +1,5 @@
 package com.vk.zenspend.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +27,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -63,8 +64,9 @@ import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.ui.components.AddTransactionSheet
 import com.vk.zenspend.ui.components.CalmAllowanceGauge
+import com.vk.zenspend.ui.components.ReceiptViewerModal
 import com.vk.zenspend.ui.components.RollingTickerText
-import com.vk.zenspend.ui.components.VkBadge
+import com.vk.zenspend.ui.components.SetBudgetSheet
 import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
@@ -72,7 +74,9 @@ import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.TerracottaAlert
 import com.vk.zenspend.ui.theme.TerracottaPastel
+import com.vk.zenspend.ui.theme.ZenCardBorder
 import com.vk.zenspend.ui.theme.ZenMotion
+import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
 import com.vk.zenspend.ui.theme.ZenTextPrimary
 import com.vk.zenspend.ui.theme.ZenTextSecondary
@@ -94,8 +98,11 @@ fun ZenDashboardScreen(
     val dailyCalmAllowance by viewModel.dailyCalmAllowance.collectAsState()
     val remainingDays = viewModel.remainingDaysInMonth
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val addSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val budgetSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isAddSheetOpen by remember { mutableStateOf(false) }
+    var isSetBudgetOpen by remember { mutableStateOf(false) }
+    var selectedReceiptUri by remember { mutableStateOf<Pair<String, String>?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -127,7 +134,7 @@ fun ZenDashboardScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Rapid Zen Entry",
+                    contentDescription = "Add Expense",
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -137,14 +144,13 @@ fun ZenDashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .statusBarsPadding()
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Top Header: Title & "by VK" Pill Badge
+                // Top Header: Title & Tagline
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -160,16 +166,40 @@ fun ZenDashboardScreen(
                                 letterSpacing = (-0.5).sp
                             )
                             Text(
-                                text = "Mindful, effortless spending",
+                                text = "Smart Expense & EMI Calculator",
                                 fontSize = 13.sp,
                                 color = ZenTextSecondary
                             )
                         }
-                        VkBadge()
+
+                        // Set Budget Pill Button
+                        Box(
+                            modifier = Modifier
+                                .clip(ZenPillShape)
+                                .background(SagePastel)
+                                .clickable { isSetBudgetOpen = true }
+                                .padding(horizontal = 12.dp, vertical = 7.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Set Budget",
+                                    tint = SagePrimary,
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Set Budget",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SagePrimary
+                                )
+                            }
+                        }
                     }
                 }
 
-                // Month's Calm Allowance Liquid Gauge Card
+                // Month's Calm Allowance Liquid Gauge with Water Drop Ripple Card
                 item {
                     ZenCard(
                         modifier = Modifier.fillMaxWidth(),
@@ -183,12 +213,13 @@ fun ZenDashboardScreen(
                                 dailyCalmAllowance = dailyCalmAllowance,
                                 spentSoFar = totalExpenses,
                                 monthlyBudget = monthlyBudget,
-                                remainingDays = remainingDays
+                                remainingDays = remainingDays,
+                                onClick = { isSetBudgetOpen = true }
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
 
-                            // Stats Pill Row (Spent vs Income)
+                            // Stats Pill Row (Spent vs Income in ₹)
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -218,7 +249,7 @@ fun ZenDashboardScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Recent Transactions",
+                            text = "Recent Expenses",
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ZenTextPrimary
@@ -263,7 +294,7 @@ fun ZenDashboardScreen(
                                     color = ZenTextPrimary
                                 )
                                 Text(
-                                    text = "Tap the + button to log your first mindful expense.",
+                                    text = "Tap the + button to log your first mindful expense in ₹.",
                                     fontSize = 13.sp,
                                     color = ZenTextSecondary
                                 )
@@ -271,7 +302,6 @@ fun ZenDashboardScreen(
                         }
                     }
                 } else {
-                    // Grouped Transactions list with Date Headers ("Today", "Yesterday", etc.)
                     groupedTransactions.forEach { (dateHeader, txList) ->
                         item {
                             Text(
@@ -284,8 +314,11 @@ fun ZenDashboardScreen(
                         }
 
                         items(txList, key = { it.id }) { tx ->
-                            TransactionRowItem(
+                            DashboardTransactionRow(
                                 transaction = tx,
+                                onViewReceipt = { uri ->
+                                    selectedReceiptUri = Pair(uri, tx.title)
+                                },
                                 onDelete = {
                                     viewModel.deleteTransaction(tx)
                                     scope.launch {
@@ -305,22 +338,43 @@ fun ZenDashboardScreen(
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(70.dp))
                 }
             }
         }
     }
 
-    // Rapid Zen Entry Bottom Sheet
+    // Add Transaction Sheet
     if (isAddSheetOpen) {
         AddTransactionSheet(
-            sheetState = sheetState,
+            sheetState = addSheetState,
             categories = categories,
             onDismiss = { isAddSheetOpen = false },
             onSaveTransaction = { tx ->
                 viewModel.addTransaction(tx)
                 isAddSheetOpen = false
             }
+        )
+    }
+
+    // Set Budget Sheet
+    if (isSetBudgetOpen) {
+        SetBudgetSheet(
+            sheetState = budgetSheetState,
+            currentBudget = monthlyBudget,
+            onDismiss = { isSetBudgetOpen = false },
+            onSaveBudget = { newAmount ->
+                viewModel.setMonthlyBudget(newAmount)
+            }
+        )
+    }
+
+    // View Receipt Modal
+    selectedReceiptUri?.let { (uri, title) ->
+        ReceiptViewerModal(
+            imageUriString = uri,
+            title = title,
+            onDismiss = { selectedReceiptUri = null }
         )
     }
 }
@@ -361,6 +415,7 @@ private fun MiniMetricBox(
             Spacer(modifier = Modifier.height(2.dp))
             RollingTickerText(
                 amount = amount,
+                currencySymbol = "₹",
                 textStyle = TextStyle(
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
@@ -372,8 +427,9 @@ private fun MiniMetricBox(
 }
 
 @Composable
-private fun TransactionRowItem(
+private fun DashboardTransactionRow(
     transaction: Transaction,
+    onViewReceipt: (String) -> Unit,
     onDelete: () -> Unit
 ) {
     val isExpense = transaction.type == TransactionType.EXPENSE
@@ -390,7 +446,6 @@ private fun TransactionRowItem(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Category Color Dot / Icon Box
             Box(
                 modifier = Modifier
                     .size(42.dp)
@@ -408,7 +463,6 @@ private fun TransactionRowItem(
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            // Title & Category Name / Time
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = transaction.title,
@@ -423,9 +477,24 @@ private fun TransactionRowItem(
                 )
             }
 
-            // Amount Display
+            // Attached Bill Icon
+            if (transaction.receiptImagePath != null) {
+                IconButton(
+                    onClick = { onViewReceipt(transaction.receiptImagePath) },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ReceiptLong,
+                        contentDescription = "View Bill",
+                        tint = SagePrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+
+            // Amount in ₹
             Text(
-                text = String.format(Locale.US, "%s$%.2f", amountPrefix, transaction.amount),
+                text = String.format(Locale.US, "%s₹%.2f", amountPrefix, transaction.amount),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = amountColor
@@ -434,7 +503,9 @@ private fun TransactionRowItem(
             // Delete action button
             IconButton(
                 onClick = onDelete,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .size(30.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,

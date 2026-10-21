@@ -1,5 +1,9 @@
 package com.vk.zenspend.ui.components
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,9 +22,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -66,7 +75,16 @@ fun AddTransactionSheet(
 ) {
     var rawInput by remember { mutableStateOf("") }
     var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
+    var title by remember { mutableStateOf("") }
     var note by remember { mutableStateOf("") }
+    var receiptUri by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        receiptUri = uri
+    }
+
     var selectedCategory by remember {
         mutableStateOf(categories.firstOrNull { it.type == selectedType } ?: categories.firstOrNull())
     }
@@ -101,7 +119,7 @@ fun AddTransactionSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Rapid Zen Entry",
+                    text = "Add Expense / Income",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = ZenTextPrimary
@@ -137,16 +155,16 @@ fun AddTransactionSheet(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Display Input Line + Real-Time Math Result
+            // Display Input Line + Real-Time Math Result (in ₹)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
                     .background(PorcelainBg)
                     .border(1.dp, ZenCardBorder, RoundedCornerShape(20.dp))
-                    .padding(horizontal = 18.dp, vertical = 14.dp)
+                    .padding(horizontal = 18.dp, vertical = 12.dp)
             ) {
                 Column {
                     Row(
@@ -155,16 +173,16 @@ fun AddTransactionSheet(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if (rawInput.isEmpty()) "$0.00" else "$rawInput",
+                            text = if (rawInput.isEmpty()) "₹0.00" else "₹$rawInput",
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (rawInput.isEmpty()) ZenTextMuted else ZenTextPrimary
                         )
 
-                        // Real-time calculated preview
+                        // Real-time calculated preview in ₹
                         if (evaluatedAmount != null && rawInput.any { it in "+-×÷*/" }) {
                             Text(
-                                text = String.format(Locale.US, "= $%.2f", evaluatedAmount),
+                                text = String.format(Locale.US, "= ₹%.2f", evaluatedAmount),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = SagePrimary
@@ -174,9 +192,9 @@ fun AddTransactionSheet(
 
                     if (rawInput.any { it in "+-×÷*/" }) {
                         Text(
-                            text = "Inline math active",
+                            text = "Inline calculator active",
                             fontSize = 11.sp,
-                            color = ZenTextSecondary
+                            color = SagePrimary
                         )
                     }
                 }
@@ -184,38 +202,13 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Category Horizontal Selector
-            val filteredCategories = categories.filter { it.type == selectedType }
-            Text(
-                text = "Category",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = ZenTextSecondary
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(filteredCategories) { cat ->
-                    val isSelected = selectedCategory?.id == cat.id
-                    CategoryChip(
-                        category = cat,
-                        isSelected = isSelected
-                    ) {
-                        selectedCategory = cat
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Optional Note / Description Field
+            // Expense Name / Label Field
             OutlinedTextField(
-                value = note,
-                onValueChange = { note = it },
+                value = title,
+                onValueChange = { title = it },
                 placeholder = {
                     Text(
-                        text = "Note (e.g. Matcha Latte, Organic Groceries)",
+                        text = "Expense Name (e.g. DMart Grocery, Coffee, Rent)",
                         fontSize = 13.sp,
                         color = ZenTextMuted
                     )
@@ -231,7 +224,72 @@ fun AddTransactionSheet(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Category Horizontal Selector
+            val filteredCategories = categories.filter { it.type == selectedType }
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filteredCategories) { cat ->
+                    val isSelected = selectedCategory?.id == cat.id
+                    CategoryChip(
+                        category = cat,
+                        isSelected = isSelected
+                    ) {
+                        selectedCategory = cat
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Attach Bill / Image Option
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(ZenPillShape)
+                        .background(if (receiptUri != null) SagePastel else PorcelainBg)
+                        .border(1.dp, if (receiptUri != null) SageAccent else ZenCardBorder, ZenPillShape)
+                        .clickable { imagePickerLauncher.launch("image/*") }
+                        .padding(horizontal = 14.dp, vertical = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ReceiptLong,
+                        contentDescription = "Attach Bill",
+                        tint = if (receiptUri != null) SagePrimary else ZenTextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = if (receiptUri != null) "Bill Attached ✓" else "Attach Bill / Receipt Photo",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = if (receiptUri != null) SagePrimary else ZenTextSecondary
+                    )
+                }
+
+                if (receiptUri != null) {
+                    IconButton(
+                        onClick = { receiptUri = null },
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Remove bill",
+                            tint = TerracottaAlert,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Integrated Custom Calculator Numpad
             CalculatorNumpad(
@@ -256,7 +314,7 @@ fun AddTransactionSheet(
                 }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Confirm Button
             Button(
@@ -264,9 +322,13 @@ fun AddTransactionSheet(
                     val finalAmount = evaluatedAmount ?: 0.0
                     val currentCat = selectedCategory ?: categories.firstOrNull()
                     if (finalAmount > 0.0 && currentCat != null) {
+                        val finalTitle = when {
+                            title.isNotBlank() -> title.trim()
+                            else -> currentCat.name
+                        }
                         val newTx = Transaction(
                             id = 0L,
-                            title = if (note.isNotBlank()) note.trim() else currentCat.name,
+                            title = finalTitle,
                             amount = finalAmount,
                             type = selectedType,
                             categoryId = currentCat.id,
@@ -274,7 +336,8 @@ fun AddTransactionSheet(
                             categoryIcon = currentCat.iconName,
                             categoryColor = currentCat.colorHex,
                             timestamp = System.currentTimeMillis(),
-                            note = note.takeIf { it.isNotBlank() }
+                            note = note.takeIf { it.isNotBlank() },
+                            receiptImagePath = receiptUri?.toString()
                         )
                         onSaveTransaction(newTx)
                         onDismiss()
@@ -282,7 +345,7 @@ fun AddTransactionSheet(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(50.dp),
                 enabled = (evaluatedAmount ?: 0.0) > 0.0,
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -292,9 +355,9 @@ fun AddTransactionSheet(
             ) {
                 Text(
                     text = if ((evaluatedAmount ?: 0.0) > 0.0) {
-                        String.format(Locale.US, "Confirm Entry • $%.2f", evaluatedAmount)
+                        String.format(Locale.US, "Confirm • ₹%.2f", evaluatedAmount)
                     } else {
-                        "Enter an Amount"
+                        "Enter Amount in ₹"
                     },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -302,7 +365,7 @@ fun AddTransactionSheet(
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }

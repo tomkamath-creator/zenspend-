@@ -14,8 +14,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.vk.zenspend.ui.screens.MainAppScaffold
 import com.vk.zenspend.ui.screens.SplashScreen
-import com.vk.zenspend.ui.screens.ZenDashboardScreen
 import com.vk.zenspend.ui.screens.ZenSpendViewModel
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.ZenMotion
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         } else {
-                            ZenDashboardScreen(viewModel = viewModel)
+                            MainAppScaffold(viewModel = viewModel)
                         }
                     }
                 }

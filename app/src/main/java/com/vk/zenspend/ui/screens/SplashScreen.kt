@@ -1,12 +1,7 @@
 package com.vk.zenspend.ui.screens
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,8 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vk.zenspend.ui.components.ZenLogo
 import com.vk.zenspend.ui.theme.PorcelainBg
-import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenMotion
@@ -41,11 +33,6 @@ import com.vk.zenspend.ui.theme.ZenTextPrimary
 import com.vk.zenspend.ui.theme.ZenTextSecondary
 import kotlinx.coroutines.delay
 
-/**
- * ZenSpend Launch Screen • by VK
- * Shows the peaceful Zen logo, app name, and "made by vk" for ~1 second
- * with gentle spring physics before transitioning to the Dashboard.
- */
 @Composable
 fun SplashScreen(
     onTimeout: () -> Unit
@@ -54,14 +41,10 @@ fun SplashScreen(
     val alpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // Smooth entrance
-        alpha.animateTo(1f, animationSpec = tween(350))
+        alpha.animateTo(1f, animationSpec = tween(300))
         scale.animateTo(1f, animationSpec = ZenMotion.GentlePulse)
-        
-        // Exact 1-second display duration requested
+        // 1-second calming display duration
         delay(1000L)
-        
-        // Notify parent to reveal Dashboard
         onTimeout()
     }
 
@@ -73,7 +56,7 @@ fun SplashScreen(
                     colors = listOf(
                         Color(0xFFFAFBFC),
                         PorcelainBg,
-                        SagePastel.copy(alpha = 0.35f)
+                        SagePastel.copy(alpha = 0.4f)
                     )
                 )
             ),
@@ -86,12 +69,11 @@ fun SplashScreen(
                 .scale(scale.value)
                 .padding(32.dp)
         ) {
-            // Balanced Zen Logo with aura
-            ZenLogo(size = 110.dp)
+            // New Expense Calculator Logo with Rupee
+            ZenLogo(size = 115.dp)
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
-            // App Name
             Text(
                 text = "ZenSpend",
                 fontSize = 32.sp,
@@ -102,29 +84,27 @@ fun SplashScreen(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Gentle Tagline
             Text(
-                text = "Mindful, effortless finances",
+                text = "Smart Expense & EMI Calculator",
                 fontSize = 15.sp,
-                fontWeight = FontWeight.Normal,
-                color = ZenTextSecondary
+                fontWeight = FontWeight.Medium,
+                color = SagePrimary
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
-            // Made by VK Signature Pill
             Box(
                 modifier = Modifier
                     .clip(ZenPillShape)
-                    .background(Color.White.copy(alpha = 0.85f))
-                    .padding(horizontal = 16.dp, vertical = 7.dp)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
             ) {
                 Text(
-                    text = "made by vk",
-                    fontSize = 13.sp,
+                    text = "Calm • Offline • ₹ Rupee",
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = SagePrimary,
-                    letterSpacing = 0.8.sp
+                    color = ZenTextSecondary,
+                    letterSpacing = 0.6.sp
                 )
             }
         }

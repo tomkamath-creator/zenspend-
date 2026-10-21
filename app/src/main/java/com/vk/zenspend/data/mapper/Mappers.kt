@@ -102,3 +102,25 @@ fun Debt.toEntity(): DebtEntity = DebtEntity(
     settledDate = settledDate,
     notes = notes
 )
+
+fun com.vk.zenspend.data.local.entity.EmiEntity.toDomain(): com.vk.zenspend.domain.model.Emi = com.vk.zenspend.domain.model.Emi(
+    id = id,
+    title = title,
+    monthlyAmount = monthlyAmount,
+    dueDayOfMonth = dueDayOfMonth,
+    totalTenureMonths = totalTenureMonths,
+    remainingMonths = remainingMonths,
+    isPaidThisMonth = isPaidThisMonth,
+    notes = notes
+)
+
+fun com.vk.zenspend.domain.model.Emi.toEntity(): com.vk.zenspend.data.local.entity.EmiEntity = com.vk.zenspend.data.local.entity.EmiEntity(
+    id = id,
+    title = title,
+    monthlyAmount = monthlyAmount,
+    dueDayOfMonth = dueDayOfMonth,
+    totalTenureMonths = totalTenureMonths,
+    remainingMonths = remainingMonths,
+    isPaidThisMonth = isPaidThisMonth,
+    notes = notes
+)

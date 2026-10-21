@@ -41,4 +41,10 @@ abstract class RepositoryModule {
     abstract fun bindDebtRepository(
         debtRepositoryImpl: DebtRepositoryImpl
     ): DebtRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEmiRepository(
+        emiRepositoryImpl: com.vk.zenspend.data.repository.EmiRepositoryImpl
+    ): com.vk.zenspend.domain.repository.EmiRepository
 }

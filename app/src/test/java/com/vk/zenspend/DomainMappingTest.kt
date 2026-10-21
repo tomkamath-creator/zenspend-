@@ -80,3 +80,24 @@ class DomainMappingTest {
         assertEquals(entity, backToEntity)
     }
 }
+
+    @Test
+    fun emiEntity_toDomainAndBack_preservesData() {
+        val entity = com.vk.zenspend.data.local.entity.EmiEntity(
+            id = 5L,
+            title = "iPhone 15 EMI",
+            monthlyAmount = 2499.0,
+            dueDayOfMonth = 10,
+            totalTenureMonths = 12,
+            remainingMonths = 8,
+            isPaidThisMonth = false,
+            notes = "HDFC Bank EMI"
+        )
+
+        val domain = entity.toDomain()
+        assertEquals("iPhone 15 EMI", domain.title)
+        assertEquals(2499.0, domain.monthlyAmount, 0.001)
+
+        val backToEntity = domain.toEntity()
+        assertEquals(entity, backToEntity)
+    }

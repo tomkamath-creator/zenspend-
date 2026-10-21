@@ -67,4 +67,9 @@ object DatabaseModule {
     fun provideDebtDao(database: ZenSpendDatabase): DebtDao {
         return database.debtDao()
     }
+
+    @Provides
+    fun provideEmiDao(database: ZenSpendDatabase): com.vk.zenspend.data.local.dao.EmiDao {
+        return database.emiDao()
+    }
 }

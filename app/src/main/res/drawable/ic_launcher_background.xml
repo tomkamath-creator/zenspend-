@@ -21,8 +21,8 @@
 
     <!-- Subtle Golden Prosperity Accent Ring -->
     <path
-        android:strokeColor="#FEE440"
+        android:strokeColor="#FFB703"
         android:strokeWidth="1.2"
-        android:strokeAlpha="0.4"
+        android:strokeAlpha="0.3"
         android:pathData="M54,24 C70.57,24 84,37.43 84,54 C84,70.57 70.57,84 54,84 C37.43,84 24,70.57 24,54 C24,37.43 37.43,24 54,24 Z" />
 </vector>
