@@ -152,11 +152,11 @@ fun InteractiveOnboardingScreen(
                     targetState = step,
                     transitionSpec = {
                         if (targetState > initialState) {
-                            slideInHorizontally(animationSpec = ZenMotion.DefaultSpring) { it } + fadeIn() togetherWith
-                                    slideOutHorizontally(animationSpec = ZenMotion.DefaultSpring) { -it } + fadeOut()
+                            slideInHorizontally(animationSpec = ZenMotion.IntOffsetSpring) { it } + fadeIn() togetherWith
+                                    slideOutHorizontally(animationSpec = ZenMotion.IntOffsetSpring) { -it } + fadeOut()
                         } else {
-                            slideInHorizontally(animationSpec = ZenMotion.DefaultSpring) { -it } + fadeIn() togetherWith
-                                    slideOutHorizontally(animationSpec = ZenMotion.DefaultSpring) { it } + fadeOut()
+                            slideInHorizontally(animationSpec = ZenMotion.IntOffsetSpring) { -it } + fadeIn() togetherWith
+                                    slideOutHorizontally(animationSpec = ZenMotion.IntOffsetSpring) { it } + fadeOut()
                         }
                     },
                     label = "onboardingStep"
