@@ -506,7 +506,7 @@ class ZenSpendViewModel @Inject constructor(
                         amount = emi.monthlyAmount,
                         type = TransactionType.EXPENSE,
                         categoryId = "calm_essentials",
-                        categoryName = "Calm Essentials",
+                        categoryName = "Bills & Utilities",
                         categoryIcon = "Payments",
                         categoryColor = 0xFFED8936L,
                         timestamp = System.currentTimeMillis(),

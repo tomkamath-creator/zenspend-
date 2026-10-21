@@ -247,7 +247,7 @@ fun CalmAllowanceGauge(
                 }
             } else {
                 Text(
-                    text = "Safe Daily Pace",
+                    text = "Daily Budget",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = ZenTextMuted,

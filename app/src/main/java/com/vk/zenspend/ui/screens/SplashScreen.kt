@@ -69,14 +69,14 @@ fun SplashScreen(
                 .scale(scale.value)
                 .padding(32.dp)
         ) {
-            // New Expense Calculator Logo with Rupee
+            // App Logo
             ZenLogo(size = 115.dp)
 
             Spacer(modifier = Modifier.height(26.dp))
 
             Text(
                 text = "ZenSpend",
-                fontSize = 32.sp,
+                fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 color = ZenTextPrimary,
                 letterSpacing = (-0.5).sp
@@ -85,7 +85,7 @@ fun SplashScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Smart Expense & EMI Calculator",
+                text = "Expense & EMI Calculator",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = SagePrimary
@@ -96,15 +96,15 @@ fun SplashScreen(
             Box(
                 modifier = Modifier
                     .clip(ZenPillShape)
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .background(Color.White.copy(alpha = 0.95f))
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Calm • Offline • ₹ Rupee",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = ZenTextSecondary,
-                    letterSpacing = 0.6.sp
+                    text = "by VK",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = SagePrimary,
+                    letterSpacing = 0.8.sp
                 )
             }
         }

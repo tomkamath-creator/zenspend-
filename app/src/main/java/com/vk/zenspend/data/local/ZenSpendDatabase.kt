@@ -42,7 +42,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
         val DEFAULT_CATEGORIES = listOf(
             CategoryEntity(
                 id = "mindful_dining",
-                name = "Mindful Dining",
+                name = "Food & Dining",
                 iconName = "Restaurant",
                 colorHex = 0xFF48BB78L,
                 type = TransactionType.EXPENSE,
@@ -50,7 +50,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "serene_living",
-                name = "Serene Living",
+                name = "Housing & Rent",
                 iconName = "Home",
                 colorHex = 0xFFED8936L,
                 type = TransactionType.EXPENSE,
@@ -58,7 +58,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "health_wellness",
-                name = "Health & Wellness",
+                name = "Health & Fitness",
                 iconName = "Spa",
                 colorHex = 0xFF38B2ACL,
                 type = TransactionType.EXPENSE,
@@ -66,7 +66,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "daily_transit",
-                name = "Daily Transit",
+                name = "Travel & Transport",
                 iconName = "DirectionsBike",
                 colorHex = 0xFF4299E1L,
                 type = TransactionType.EXPENSE,
@@ -74,7 +74,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "focus_growth",
-                name = "Focus & Growth",
+                name = "Education & Growth",
                 iconName = "MenuBook",
                 colorHex = 0xFF9F7AEAL,
                 type = TransactionType.EXPENSE,
@@ -82,7 +82,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "coffee_rituals",
-                name = "Coffee & Rituals",
+                name = "Coffee & Snacks",
                 iconName = "LocalCafe",
                 colorHex = 0xFFD69E2EL,
                 type = TransactionType.EXPENSE,
@@ -90,7 +90,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "leisure_play",
-                name = "Leisure & Play",
+                name = "Entertainment & Leisure",
                 iconName = "Palette",
                 colorHex = 0xFFF56565L,
                 type = TransactionType.EXPENSE,
@@ -98,7 +98,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "calm_essentials",
-                name = "Calm Essentials",
+                name = "Bills & Utilities",
                 iconName = "ShoppingBag",
                 colorHex = 0xFF718096L,
                 type = TransactionType.EXPENSE,
@@ -106,7 +106,7 @@ abstract class ZenSpendDatabase : RoomDatabase() {
             ),
             CategoryEntity(
                 id = "zen_stream",
-                name = "Zen Stream (Income)",
+                name = "Salary & Income",
                 iconName = "Payments",
                 colorHex = 0xFF2ECC71L,
                 type = TransactionType.INCOME,

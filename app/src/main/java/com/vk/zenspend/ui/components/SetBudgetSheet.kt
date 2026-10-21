@@ -84,7 +84,7 @@ fun SetBudgetSheet(
                 color = ZenTextPrimary
             )
             Text(
-                text = "ZenSpend uses this to calculate your safe daily calm allowance.",
+                text = "This sets your monthly limit and calculates your daily budget.",
                 fontSize = 13.sp,
                 color = ZenTextSecondary
             )

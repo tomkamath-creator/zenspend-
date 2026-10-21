@@ -83,7 +83,7 @@ fun AddEmiSheet(
                 color = ZenTextPrimary
             )
             Text(
-                text = "Track your fixed monthly commitments calmly in ₹.",
+                text = "Track your monthly loans and EMI due dates in ₹.",
                 fontSize = 13.sp,
                 color = ZenTextSecondary
             )

@@ -315,7 +315,7 @@ private fun StepNameQuestion(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "ZenSpend personalizes your budget experience and keeps your finances peaceful.",
+            text = "ZenSpend helps you track expenses, manage bills, and control your monthly budget.",
             fontSize = 14.sp,
             color = ZenTextSecondary,
             textAlign = TextAlign.Center
@@ -517,7 +517,7 @@ private fun StepBudgetQuestion(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = "This sets your spending boundary and powers your Daily Calm Allowance gauge.",
+            text = "This sets your monthly limit and calculates your recommended daily budget.",
             fontSize = 14.sp,
             color = ZenTextSecondary,
             textAlign = TextAlign.Center

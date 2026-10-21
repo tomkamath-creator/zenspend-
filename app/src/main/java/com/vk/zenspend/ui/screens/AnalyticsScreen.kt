@@ -175,7 +175,7 @@ fun AnalyticsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = if (isMore) "More Spent" else "Less Spent (Calm)",
+                                    text = if (isMore) "Above Budget" else "Under Budget (Saved)",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = badgeColor

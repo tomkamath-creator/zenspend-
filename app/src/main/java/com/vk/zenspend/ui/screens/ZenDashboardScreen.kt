@@ -167,7 +167,7 @@ fun ZenDashboardScreen(
                                 letterSpacing = (-0.5).sp
                             )
                             Text(
-                                text = "Daily Calm Pace & Expenses",
+                                text = "Expense & Budget Tracker",
                                 fontSize = 13.sp,
                                 color = ZenTextSecondary
                             )
@@ -227,7 +227,7 @@ fun ZenDashboardScreen(
                                 }
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Set your monthly spending limit to activate the water-drop allowance gauge and daily pacing.",
+                                    text = "Set your monthly spending limit to calculate your daily budget and track your expenses.",
                                     fontSize = 12.sp,
                                     color = ZenTextSecondary
                                 )
@@ -339,13 +339,13 @@ fun ZenDashboardScreen(
                                 }
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Text(
-                                    text = "Your ledger is peaceful and clear",
+                                    text = "No expenses recorded yet",
                                     fontSize = 15.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = ZenTextPrimary
                                 )
                                 Text(
-                                    text = "Tap the + button to log your first mindful expense in ₹.",
+                                    text = "Tap the + button to add your first expense or bill in ₹.",
                                     fontSize = 13.sp,
                                     color = ZenTextSecondary
                                 )
