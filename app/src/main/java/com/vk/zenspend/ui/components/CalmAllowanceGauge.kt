@@ -207,33 +207,68 @@ fun CalmAllowanceGauge(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Safe Daily Pace",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                color = ZenTextMuted,
-                letterSpacing = 0.5.sp
-            )
+            if (monthlyBudget <= 0.0) {
+                Text(
+                    text = "Monthly Budget",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = ZenTextMuted,
+                    letterSpacing = 0.5.sp
+                )
 
-            Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-            RollingTickerText(
-                amount = dailyCalmAllowance,
-                currencySymbol = "₹",
-                textStyle = TextStyle(
-                    fontSize = 25.sp,
+                Text(
+                    text = "₹0.00",
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = ZenTextPrimary
                 )
-            )
 
-            Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-            Text(
-                text = "for next $remainingDays days",
-                fontSize = 12.sp,
-                color = ZenTextSecondary
-            )
+                Box(
+                    modifier = Modifier
+                        .clip(ZenPillShape)
+                        .background(SagePastel)
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "Tap to set budget",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SagePrimary
+                    )
+                }
+            } else {
+                Text(
+                    text = "Safe Daily Pace",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = ZenTextMuted,
+                    letterSpacing = 0.5.sp
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                RollingTickerText(
+                    amount = dailyCalmAllowance,
+                    currencySymbol = "₹",
+                    textStyle = TextStyle(
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ZenTextPrimary
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = "for next $remainingDays days",
+                    fontSize = 12.sp,
+                    color = ZenTextSecondary
+                )
+            }
         }
     }
 }

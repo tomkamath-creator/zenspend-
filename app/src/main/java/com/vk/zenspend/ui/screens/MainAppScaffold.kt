@@ -11,17 +11,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -49,13 +51,13 @@ import com.vk.zenspend.ui.theme.ZenCardBorder
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
-import com.vk.zenspend.ui.theme.ZenTextSecondary
 
 /**
- * Main App Container with Crystal-Clear Bottom Navigation:
- * Tab 0: Home (Zen Dashboard & Daily Calm Allowance Gauge)
- * Tab 1: Expenses (Search, Filter, Full Ledger, Attached Bills)
- * Tab 2: Budget & EMI (Set Monthly Budget Limit & EMI / Loan Tracker)
+ * Main App Container with Crystal-Clear 4-Tab Bottom Navigation:
+ * Tab 0: Home (Dashboard & Daily Calm Allowance Gauge)
+ * Tab 1: Analytics (Morphing Donut, Bézier Trend Line, Monthly & Yearly Spend)
+ * Tab 2: Expenses (Search, Filter, Full Ledger, Attached Bills)
+ * Tab 3: Budget & Loans (Set Monthly Budget Limit & EMI / Loan Tracker)
  */
 @Composable
 fun MainAppScaffold(
@@ -71,44 +73,61 @@ fun MainAppScaffold(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .padding(horizontal = 14.dp, vertical = 8.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(elevation = 10.dp, shape = RoundedCornerShape(26.dp), ambientColor = Color.Black.copy(alpha = 0.08f))
+                        .shadow(
+                            elevation = 10.dp,
+                            shape = RoundedCornerShape(26.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.08f)
+                        )
                         .clip(RoundedCornerShape(26.dp))
                         .background(Color.White)
                         .border(1.dp, ZenCardBorder.copy(alpha = 0.8f), RoundedCornerShape(26.dp))
-                        .padding(horizontal = 8.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceAround,
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     NavTabItem(
                         icon = Icons.Default.Home,
                         label = "Home",
-                        isSelected = selectedTab == 0
+                        isSelected = selectedTab == 0,
+                        modifier = Modifier.weight(1f)
                     ) {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         selectedTab = 0
                     }
 
                     NavTabItem(
-                        icon = Icons.Default.ReceiptLong,
-                        label = "Expenses",
-                        isSelected = selectedTab == 1
+                        icon = Icons.Default.PieChart,
+                        label = "Analytics",
+                        isSelected = selectedTab == 1,
+                        modifier = Modifier.weight(1f)
                     ) {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         selectedTab = 1
                     }
 
                     NavTabItem(
-                        icon = Icons.Default.AccountBalanceWallet,
-                        label = "Budget & EMI",
-                        isSelected = selectedTab == 2
+                        icon = Icons.Default.ReceiptLong,
+                        label = "Expenses",
+                        isSelected = selectedTab == 2,
+                        modifier = Modifier.weight(1f)
                     ) {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         selectedTab = 2
+                    }
+
+                    NavTabItem(
+                        icon = Icons.Default.AccountBalanceWallet,
+                        label = "Budget & EMI",
+                        isSelected = selectedTab == 3,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        selectedTab = 3
                     }
                 }
             }
@@ -130,8 +149,9 @@ fun MainAppScaffold(
             ) { tab ->
                 when (tab) {
                     0 -> ZenDashboardScreen(viewModel = viewModel)
-                    1 -> ExpensesLedgerScreen(viewModel = viewModel)
-                    2 -> BudgetAndEmiScreen(viewModel = viewModel)
+                    1 -> AnalyticsScreen(viewModel = viewModel)
+                    2 -> ExpensesLedgerScreen(viewModel = viewModel)
+                    3 -> BudgetAndEmiScreen(viewModel = viewModel)
                 }
             }
         }
@@ -143,18 +163,20 @@ private fun NavTabItem(
     icon: ImageVector,
     label: String,
     isSelected: Boolean,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     val bgColor = if (isSelected) SagePastel else Color.Transparent
     val contentColor = if (isSelected) SagePrimary else ZenTextMuted
 
-    Row(
-        modifier = Modifier
-            .clip(ZenPillShape)
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(18.dp))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 6.dp, vertical = 7.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = icon,
@@ -162,14 +184,13 @@ private fun NavTabItem(
             tint = contentColor,
             modifier = Modifier.size(20.dp)
         )
-        if (isSelected) {
-            Text(
-                text = label,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = contentColor,
-                modifier = Modifier.padding(start = 6.dp)
-            )
-        }
+        Spacer(modifier = Modifier.height(3.dp))
+        Text(
+            text = label,
+            fontSize = 11.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color = contentColor,
+            maxLines = 1
+        )
     }
 }

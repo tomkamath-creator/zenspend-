@@ -268,19 +268,20 @@ private fun LedgerItemRow(
                         .padding(end = 8.dp)
                         .clip(ZenPillShape)
                         .background(SagePastel)
+                        .border(1.dp, SageAccent.copy(alpha = 0.5f), ZenPillShape)
                         .clickable { onViewReceipt(transaction.receiptImagePath) }
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 9.dp, vertical = 5.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.ReceiptLong,
                             contentDescription = "View Bill",
                             tint = SagePrimary,
-                            modifier = Modifier.size(14.dp)
+                            modifier = Modifier.size(13.dp)
                         )
-                        Spacer(modifier = Modifier.width(3.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Bill",
+                            text = "View Bill 📷",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = SagePrimary

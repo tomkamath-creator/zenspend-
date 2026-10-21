@@ -14,6 +14,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.vk.zenspend.ui.screens.InteractiveOnboardingScreen
 import com.vk.zenspend.ui.screens.MainAppScaffold
 import com.vk.zenspend.ui.screens.SplashScreen
 import com.vk.zenspend.ui.screens.ZenSpendViewModel
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ZenSpendTheme {
                 val isSplashVisible by viewModel.isSplashVisible.collectAsState()
+                val hasCompletedOnboarding by viewModel.hasCompletedOnboarding.collectAsState()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -54,7 +56,24 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         } else {
-                            MainAppScaffold(viewModel = viewModel)
+                            AnimatedContent(
+                                targetState = hasCompletedOnboarding,
+                                transitionSpec = {
+                                    fadeIn(animationSpec = ZenMotion.DefaultSpring) togetherWith
+                                            fadeOut(animationSpec = ZenMotion.DefaultSpring)
+                                },
+                                label = "onboardingTransition"
+                            ) { isDone ->
+                                if (isDone) {
+                                    MainAppScaffold(viewModel = viewModel)
+                                } else {
+                                    InteractiveOnboardingScreen(
+                                        onComplete = { name, salary, budget, emi ->
+                                            viewModel.completeOnboarding(name, salary, budget, emi)
+                                        }
+                                    )
+                                }
+                            }
                         }
                     }
                 }

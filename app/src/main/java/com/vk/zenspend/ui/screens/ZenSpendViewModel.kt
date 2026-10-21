@@ -2,11 +2,16 @@ package com.vk.zenspend.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vk.zenspend.data.repository.UserPreferencesRepository
 import com.vk.zenspend.domain.model.Budget
 import com.vk.zenspend.domain.model.Category
+import com.vk.zenspend.domain.model.CategorySpend
 import com.vk.zenspend.domain.model.Emi
+import com.vk.zenspend.domain.model.SpendComparison
+import com.vk.zenspend.domain.model.SpendPeriod
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
+import com.vk.zenspend.domain.model.TrendPoint
 import com.vk.zenspend.domain.repository.BudgetRepository
 import com.vk.zenspend.domain.repository.CategoryRepository
 import com.vk.zenspend.domain.repository.DebtRepository
@@ -18,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -25,6 +31,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlin.math.max
 
 @HiltViewModel
@@ -33,7 +40,8 @@ class ZenSpendViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
     private val budgetRepository: BudgetRepository,
     private val debtRepository: DebtRepository,
-    private val emiRepository: EmiRepository
+    private val emiRepository: EmiRepository,
+    private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
     // 1-second splash screen control
@@ -42,6 +50,43 @@ class ZenSpendViewModel @Inject constructor(
 
     fun dismissSplash() {
         _isSplashVisible.value = false
+    }
+
+    // User Profile & Onboarding
+    val userName: StateFlow<String> = userPreferencesRepository.userName
+    val monthlySalary: StateFlow<Double> = userPreferencesRepository.monthlySalary
+    val hasCompletedOnboarding: StateFlow<Boolean> = userPreferencesRepository.hasCompletedOnboarding
+
+    fun completeOnboarding(name: String, salary: Double, budget: Double, initialEmi: Emi?) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveUserProfile(name, salary)
+            if (budget > 0.0) {
+                setMonthlyBudget(budget)
+            }
+            if (initialEmi != null) {
+                emiRepository.insertEmi(initialEmi)
+            }
+            if (salary > 0.0) {
+                transactionRepository.insertTransaction(
+                    Transaction(
+                        title = "Monthly Salary Income",
+                        amount = salary,
+                        type = TransactionType.INCOME,
+                        categoryId = "focus_growth",
+                        categoryName = "Focus & Growth",
+                        categoryIcon = "Savings",
+                        categoryColor = 0xFF48BB78L,
+                        timestamp = System.currentTimeMillis(),
+                        note = "Recorded during initial onboarding setup"
+                    )
+                )
+            }
+            userPreferencesRepository.setOnboardingCompleted(true)
+        }
+    }
+
+    fun restartOnboarding() {
+        userPreferencesRepository.resetOnboarding()
     }
 
     val categories: StateFlow<List<Category>> = categoryRepository
@@ -60,12 +105,12 @@ class ZenSpendViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    // Current month start & end timestamps
+    // Current calendar boundaries
     private val calendar = Calendar.getInstance()
     private val currentMonth = calendar.get(Calendar.MONTH) + 1
     private val currentYear = calendar.get(Calendar.YEAR)
 
-    private val startOfMonth: Long = Calendar.getInstance().apply {
+    val startOfMonth: Long = Calendar.getInstance().apply {
         set(Calendar.DAY_OF_MONTH, 1)
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
@@ -73,8 +118,62 @@ class ZenSpendViewModel @Inject constructor(
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
 
-    private val endOfMonth: Long = Calendar.getInstance().apply {
+    val endOfMonth: Long = Calendar.getInstance().apply {
         set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }.timeInMillis
+
+    private val startOfLastMonth: Long = Calendar.getInstance().apply {
+        add(Calendar.MONTH, -1)
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    private val endOfLastMonth: Long = Calendar.getInstance().apply {
+        add(Calendar.MONTH, -1)
+        set(Calendar.DAY_OF_MONTH, getActualMaximum(Calendar.DAY_OF_MONTH))
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }.timeInMillis
+
+    val startOfYear: Long = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_YEAR, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    val endOfYear: Long = Calendar.getInstance().apply {
+        set(Calendar.MONTH, Calendar.DECEMBER)
+        set(Calendar.DAY_OF_MONTH, 31)
+        set(Calendar.HOUR_OF_DAY, 23)
+        set(Calendar.MINUTE, 59)
+        set(Calendar.SECOND, 59)
+        set(Calendar.MILLISECOND, 999)
+    }.timeInMillis
+
+    private val startOfLastYear: Long = Calendar.getInstance().apply {
+        add(Calendar.YEAR, -1)
+        set(Calendar.DAY_OF_YEAR, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    private val endOfLastYear: Long = Calendar.getInstance().apply {
+        add(Calendar.YEAR, -1)
+        set(Calendar.MONTH, Calendar.DECEMBER)
+        set(Calendar.DAY_OF_MONTH, 31)
         set(Calendar.HOUR_OF_DAY, 23)
         set(Calendar.MINUTE, 59)
         set(Calendar.SECOND, 59)
@@ -83,6 +182,7 @@ class ZenSpendViewModel @Inject constructor(
 
     val totalExpensesThisMonth: StateFlow<Double> = transactionRepository
         .getTotalExpensesBetween(startOfMonth, endOfMonth)
+        .map { it ?: 0.0 }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -91,6 +191,7 @@ class ZenSpendViewModel @Inject constructor(
 
     val totalIncomeThisMonth: StateFlow<Double> = transactionRepository
         .getTotalIncomeBetween(startOfMonth, endOfMonth)
+        .map { it ?: 0.0 }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -105,14 +206,13 @@ class ZenSpendViewModel @Inject constructor(
             initialValue = null
         )
 
+    // Initial budget is 0.00 until set by user
     val monthlyBudgetAmount: StateFlow<Double> = currentBudget
-        .combine(totalExpensesThisMonth) { budget, _ ->
-            budget?.totalMonthlyBudget ?: 25000.0 // Default calm target of ₹25,000
-        }
+        .map { it?.totalMonthlyBudget ?: 0.0 }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 25000.0
+            initialValue = 0.0
         )
 
     val remainingDaysInMonth: Int = run {
@@ -127,12 +227,16 @@ class ZenSpendViewModel @Inject constructor(
         monthlyBudgetAmount,
         totalExpensesThisMonth
     ) { budget, spent ->
-        val remainingBudget = max(0.0, budget - spent)
-        remainingBudget / remainingDaysInMonth
+        if (budget <= 0.0) {
+            0.0
+        } else {
+            val remainingBudget = max(0.0, budget - spent)
+            remainingBudget / remainingDaysInMonth
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = 25000.0 / remainingDaysInMonth
+        initialValue = 0.0
     )
 
     // EMIs
@@ -182,6 +286,177 @@ class ZenSpendViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyMap()
         )
+
+    // Analytics: Period Toggle (Monthly vs Yearly)
+    val selectedSpendPeriod = MutableStateFlow(SpendPeriod.THIS_MONTH)
+
+    fun setSpendPeriod(period: SpendPeriod) {
+        selectedSpendPeriod.value = period
+    }
+
+    // Monthly Spend Comparison (This Month vs Last Month)
+    val monthlySpendComparison: StateFlow<SpendComparison> = transactions.map { txList ->
+        val thisMonthSpent = txList
+            .filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfMonth..endOfMonth }
+            .sumOf { it.amount }
+
+        val lastMonthSpent = txList
+            .filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfLastMonth..endOfLastMonth }
+            .sumOf { it.amount }
+
+        val diff = abs(thisMonthSpent - lastMonthSpent)
+        val isMore = thisMonthSpent > lastMonthSpent
+        val deltaPct = if (lastMonthSpent > 0) ((thisMonthSpent - lastMonthSpent) / lastMonthSpent) * 100 else 0.0
+
+        val summary = when {
+            lastMonthSpent == 0.0 && thisMonthSpent > 0 -> "First active tracking month on ZenSpend"
+            isMore -> String.format(Locale.getDefault(), "↑ %.1f%% more spent than last month (+₹%,.0f)", deltaPct, diff)
+            thisMonthSpent < lastMonthSpent -> String.format(Locale.getDefault(), "↓ %.1f%% less spent than last month (Saved ₹%,.0f)", abs(deltaPct), diff)
+            else -> "Spending pace is steady compared to last month"
+        }
+
+        SpendComparison(
+            currentPeriodAmount = thisMonthSpent,
+            previousPeriodAmount = lastMonthSpent,
+            deltaPercentage = deltaPct,
+            isMoreSpent = isMore,
+            differenceAmount = diff,
+            summaryText = summary
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SpendComparison(0.0, 0.0, 0.0, false, 0.0, "Ready to analyze")
+    )
+
+    // Yearly Spend Comparison (This Year vs Last Year)
+    val yearlySpendComparison: StateFlow<SpendComparison> = transactions.map { txList ->
+        val thisYearSpent = txList
+            .filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfYear..endOfYear }
+            .sumOf { it.amount }
+
+        val lastYearSpent = txList
+            .filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfLastYear..endOfLastYear }
+            .sumOf { it.amount }
+
+        val diff = abs(thisYearSpent - lastYearSpent)
+        val isMore = thisYearSpent > lastYearSpent
+        val deltaPct = if (lastYearSpent > 0) ((thisYearSpent - lastYearSpent) / lastYearSpent) * 100 else 0.0
+
+        val summary = when {
+            lastYearSpent == 0.0 && thisYearSpent > 0 -> "Year-to-date tracking in progress"
+            isMore -> String.format(Locale.getDefault(), "↑ %.1f%% higher than last year (+₹%,.0f)", deltaPct, diff)
+            thisYearSpent < lastYearSpent -> String.format(Locale.getDefault(), "↓ %.1f%% lower than last year (Saved ₹%,.0f)", abs(deltaPct), diff)
+            else -> "Annual spending trajectory is balanced"
+        }
+
+        SpendComparison(
+            currentPeriodAmount = thisYearSpent,
+            previousPeriodAmount = lastYearSpent,
+            deltaPercentage = deltaPct,
+            isMoreSpent = isMore,
+            differenceAmount = diff,
+            summaryText = summary
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = SpendComparison(0.0, 0.0, 0.0, false, 0.0, "Ready to analyze")
+    )
+
+    // Monthly Trend Points (Day by Day for Bézier Curve)
+    val monthlyTrendPoints: StateFlow<List<TrendPoint>> = transactions.map { txList ->
+        val cal = Calendar.getInstance()
+        val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val dailyMap = mutableMapOf<Int, Double>()
+
+        txList.filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfMonth..endOfMonth }
+            .forEach { tx ->
+                cal.timeInMillis = tx.timestamp
+                val day = cal.get(Calendar.DAY_OF_MONTH)
+                dailyMap[day] = (dailyMap[day] ?: 0.0) + tx.amount
+            }
+
+        (1..daysInMonth).map { day ->
+            TrendPoint(
+                label = "Day $day",
+                value = dailyMap[day] ?: 0.0
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    // Yearly Trend Points (12 Months for Bézier Curve)
+    val yearlyTrendPoints: StateFlow<List<TrendPoint>> = transactions.map { txList ->
+        val monthNames = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        val monthlyMap = mutableMapOf<Int, Double>()
+        val cal = Calendar.getInstance()
+
+        txList.filter { it.type == TransactionType.EXPENSE && it.timestamp in startOfYear..endOfYear }
+            .forEach { tx ->
+                cal.timeInMillis = tx.timestamp
+                val m = cal.get(Calendar.MONTH) // 0-11
+                monthlyMap[m] = (monthlyMap[m] ?: 0.0) + tx.amount
+            }
+
+        (0..11).map { m ->
+            TrendPoint(
+                label = monthNames[m],
+                value = monthlyMap[m] ?: 0.0
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    // Category Spend Breakdown for Morphing Donut Chart
+    val categorySpendBreakdown: StateFlow<List<CategorySpend>> = combine(
+        transactions,
+        selectedSpendPeriod,
+        categories
+    ) { txList, period, catList ->
+        val (rangeStart, rangeEnd) = if (period == SpendPeriod.THIS_MONTH) {
+            startOfMonth to endOfMonth
+        } else {
+            startOfYear to endOfYear
+        }
+
+        val periodExpenses = txList.filter {
+            it.type == TransactionType.EXPENSE && it.timestamp in rangeStart..rangeEnd
+        }
+
+        val totalPeriodSpent = periodExpenses.sumOf { it.amount }
+        if (totalPeriodSpent <= 0.0) {
+            emptyList()
+        } else {
+            val groupMap = periodExpenses.groupBy { it.categoryId }
+            groupMap.map { (catId, items) ->
+                val sum = items.sumOf { it.amount }
+                val catMeta = catList.find { it.id == catId }
+                val name = catMeta?.name ?: items.firstOrNull()?.categoryName ?: "Other"
+                val colorHex = catMeta?.colorHex ?: items.firstOrNull()?.categoryColor ?: 0xFF48BB78L
+                val icon = catMeta?.iconName ?: items.firstOrNull()?.categoryIcon ?: "Spa"
+
+                CategorySpend(
+                    categoryId = catId,
+                    categoryName = name,
+                    colorHex = colorHex,
+                    iconName = icon,
+                    amount = sum,
+                    percentage = (sum / totalPeriodSpent).toFloat()
+                )
+            }.sortedByDescending { it.amount }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {

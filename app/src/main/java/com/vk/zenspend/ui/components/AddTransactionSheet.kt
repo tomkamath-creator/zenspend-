@@ -23,6 +23,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
@@ -244,47 +246,81 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Attach Bill / Image Option
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            // Prominent Attach Bill / Receipt Photo Card
+            ZenCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { imagePickerLauncher.launch("image/*") },
+                elevation = 1.dp
             ) {
                 Row(
-                    modifier = Modifier
-                        .clip(ZenPillShape)
-                        .background(if (receiptUri != null) SagePastel else PorcelainBg)
-                        .border(1.dp, if (receiptUri != null) SageAccent else ZenCardBorder, ZenPillShape)
-                        .clickable { imagePickerLauncher.launch("image/*") }
-                        .padding(horizontal = 14.dp, vertical = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.ReceiptLong,
-                        contentDescription = "Attach Bill",
-                        tint = if (receiptUri != null) SagePrimary else ZenTextSecondary,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (receiptUri != null) "Bill Attached ✓" else "Attach Bill / Receipt Photo",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (receiptUri != null) SagePrimary else ZenTextSecondary
-                    )
-                }
-
-                if (receiptUri != null) {
-                    IconButton(
-                        onClick = { receiptUri = null },
-                        modifier = Modifier.size(30.dp)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Remove bill",
-                            tint = TerracottaAlert,
-                            modifier = Modifier.size(16.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(if (receiptUri != null) SagePastel else PorcelainBg)
+                                .border(1.dp, if (receiptUri != null) SageAccent else ZenCardBorder, RoundedCornerShape(10.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (receiptUri != null) Icons.Default.Check else Icons.Default.AddPhotoAlternate,
+                                contentDescription = "Bill Icon",
+                                tint = if (receiptUri != null) SagePrimary else ZenTextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Text(
+                                text = if (receiptUri != null) "✓ Bill / Invoice Attached" else "Attach Bill or Invoice Photo",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (receiptUri != null) SagePrimary else ZenTextPrimary
+                            )
+                            Text(
+                                text = if (receiptUri != null) "Tap to change image" else "Upload receipt photo from gallery (Optional)",
+                                fontSize = 11.sp,
+                                color = ZenTextMuted
+                            )
+                        }
+                    }
+
+                    if (receiptUri != null) {
+                        IconButton(
+                            onClick = { receiptUri = null },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Remove bill",
+                                tint = TerracottaAlert,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .clip(ZenPillShape)
+                                .background(SagePastel)
+                                .padding(horizontal = 10.dp, vertical = 5.dp)
+                        ) {
+                            Text(
+                                text = "Browse 📷",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = SagePrimary
+                            )
+                        }
                     }
                 }
             }

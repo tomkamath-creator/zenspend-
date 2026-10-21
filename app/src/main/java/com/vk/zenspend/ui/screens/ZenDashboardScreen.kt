@@ -90,6 +90,7 @@ import java.util.Locale
 fun ZenDashboardScreen(
     viewModel: ZenSpendViewModel
 ) {
+    val userName by viewModel.userName.collectAsState()
     val categories by viewModel.categories.collectAsState()
     val groupedTransactions by viewModel.groupedTransactions.collectAsState()
     val totalExpenses by viewModel.totalExpensesThisMonth.collectAsState()
@@ -159,41 +160,91 @@ fun ZenDashboardScreen(
                     ) {
                         Column {
                             Text(
-                                text = "ZenSpend",
-                                fontSize = 28.sp,
+                                text = if (userName.isNotBlank()) "Hi $userName 👋" else "ZenSpend",
+                                fontSize = 26.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ZenTextPrimary,
                                 letterSpacing = (-0.5).sp
                             )
                             Text(
-                                text = "Smart Expense & EMI Calculator",
+                                text = "Daily Calm Pace & Expenses",
                                 fontSize = 13.sp,
                                 color = ZenTextSecondary
                             )
                         }
 
-                        // Set Budget Pill Button
-                        Box(
-                            modifier = Modifier
-                                .clip(ZenPillShape)
-                                .background(SagePastel)
-                                .clickable { isSetBudgetOpen = true }
-                                .padding(horizontal = 12.dp, vertical = 7.dp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Set Budget Pill Button
+                            Box(
+                                modifier = Modifier
+                                    .clip(ZenPillShape)
+                                    .background(SagePastel)
+                                    .clickable { isSetBudgetOpen = true }
+                                    .padding(horizontal = 12.dp, vertical = 7.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "Set Budget",
+                                        tint = SagePrimary,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (monthlyBudget > 0) "Budget: ₹%,.0f".format(monthlyBudget) else "Set Budget",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = SagePrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Initial Budget Banner if budget is 0.00
+                if (monthlyBudget <= 0.0) {
+                    item {
+                        ZenCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            elevation = 2.dp
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = "Set Budget",
-                                    tint = SagePrimary,
-                                    modifier = Modifier.size(13.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Spa,
+                                        contentDescription = null,
+                                        tint = SagePrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Initial Budget is ₹0.00",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = ZenTextPrimary
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Set Budget",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = SagePrimary
+                                    text = "Set your monthly spending limit to activate the water-drop allowance gauge and daily pacing.",
+                                    fontSize = 12.sp,
+                                    color = ZenTextSecondary
                                 )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                androidx.compose.material3.Button(
+                                    onClick = { isSetBudgetOpen = true },
+                                    shape = ZenPillShape,
+                                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = SagePrimary),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "🎯 Set Monthly Budget Now",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        color = Color.White
+                                    )
+                                }
                             }
                         }
                     }

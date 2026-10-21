@@ -81,6 +81,8 @@ import java.util.Locale
 fun BudgetAndEmiScreen(
     viewModel: ZenSpendViewModel
 ) {
+    val userName by viewModel.userName.collectAsState()
+    val monthlySalary by viewModel.monthlySalary.collectAsState()
     val monthlyBudget by viewModel.monthlyBudgetAmount.collectAsState()
     val totalExpenses by viewModel.totalExpensesThisMonth.collectAsState()
     val emis by viewModel.emis.collectAsState()
@@ -118,6 +120,71 @@ fun BudgetAndEmiScreen(
                     fontSize = 13.sp,
                     color = ZenTextSecondary
                 )
+            }
+        }
+
+        // Monthly Salary & Cash Flow Card (if salary is recorded)
+        if (monthlySalary > 0.0) {
+            item {
+                ZenCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = 2.dp
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Monthly Income & Buffer",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ZenTextPrimary
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .clip(ZenPillShape)
+                                    .background(SagePastel)
+                                    .padding(horizontal = 9.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = String.format(Locale.getDefault(), "Income: ₹%,.0f", monthlySalary),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SagePrimary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        val projectedSavings = kotlin.math.max(0.0, monthlySalary - monthlyBudget - totalEmiBurden)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(text = "Projected Savings", fontSize = 11.sp, color = ZenTextMuted)
+                                Text(
+                                    text = String.format(Locale.getDefault(), "₹%,.0f", projectedSavings),
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SagePrimary
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.End) {
+                                Text(text = "EMI Commitment", fontSize = 11.sp, color = ZenTextMuted)
+                                Text(
+                                    text = String.format(Locale.getDefault(), "₹%,.0f/mo", totalEmiBurden),
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = ApricotCaution
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
