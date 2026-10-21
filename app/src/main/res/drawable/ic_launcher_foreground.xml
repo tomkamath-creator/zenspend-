@@ -4,42 +4,58 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    
-    <!-- Zen Balance Stones & Growth Ring -->
-    <!-- Base Large Stone (Muted Sage) -->
+
+    <!-- Zen Stones Balance Cairn -->
+
+    <!-- Base Stone: Forest Emerald (#1B4332) -->
+    <path
+        android:fillColor="#1B4332"
+        android:pathData="M28,68 C28,60 80,60 80,68 C80,75 28,75 28,68 Z" />
+
+    <!-- Middle-Low Stone: Deep Sage (#2D6A4F) -->
     <path
         android:fillColor="#2D6A4F"
-        android:pathData="M32,68 C32,62 76,62 76,68 C76,74 32,74 32,68 Z" />
-    
-    <!-- Middle Stone (Fresh Sage) -->
+        android:pathData="M34,56 C34,49 74,49 74,56 C74,62 34,62 34,56 Z" />
+
+    <!-- Middle-Top Stone: Calming Sage Green (#40916C) -->
+    <path
+        android:fillColor="#40916C"
+        android:pathData="M40,45 C40,39 68,39 68,45 C68,50 40,50 40,45 Z" />
+
+    <!-- Top Cap Stone: Fresh Mint Sage (#52B788) -->
     <path
         android:fillColor="#52B788"
-        android:pathData="M38,55 C38,50 70,50 70,55 C70,60 38,60 38,55 Z" />
-    
-    <!-- Top Stone (Warm Amber/Gold Accent) -->
-    <path
-        android:fillColor="#E9C46A"
-        android:pathData="M45,43 C45,39 63,39 63,43 C63,47 45,47 45,43 Z" />
+        android:pathData="M46,36 C46,31 62,31 62,36 C62,40 46,40 46,36 Z" />
 
-    <!-- Lotus / Leaf Bud of Prosperity -->
+    <!-- Crown: Golden Zen Prosperity Sprout / Bud (#FFB703) -->
     <path
-        android:fillColor="#2A9D8F"
-        android:pathData="M54,30 C56,33 58,37 54,39 C50,37 52,33 54,30 Z" />
+        android:fillColor="#FFB703"
+        android:pathData="M54,23 C57.5,27 60,31.5 54,34 C48,31.5 50.5,27 54,23 Z" />
 
-    <!-- Modern Minimalist VK Monogram / Seal -->
-    <!-- 'V' stroke -->
+    <!-- Left Sprout Leaf (#74C69D) -->
+    <path
+        android:fillColor="#74C69D"
+        android:pathData="M52,28 C47,27 46,31 51,32 Z" />
+
+    <!-- Right Sprout Leaf (#95D5B2) -->
+    <path
+        android:fillColor="#95D5B2"
+        android:pathData="M56,28 C61,27 62,31 57,32 Z" />
+
+    <!-- Pure Minimalist 'VK' Signature Emblem in Base Stone -->
+    <!-- 'V' -->
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.6"
+        android:strokeWidth="1.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M48,65 L52,70 L56,65" />
-    
-    <!-- 'K' stroke -->
+        android:pathData="M46,65.5 L50,71 L54,65.5" />
+
+    <!-- 'K' -->
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="1.6"
+        android:strokeWidth="1.8"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M58,65 L58,70 M62,65 L58,67.5 L62,70" />
+        android:pathData="M56,65.5 L56,71 M61,65.5 L56,68.2 L61,71" />
 </vector>

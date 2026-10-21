@@ -5,8 +5,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import com.vk.zenspend.ui.screens.ZenSpendRootScreen
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import com.vk.zenspend.ui.screens.SplashScreen
+import com.vk.zenspend.ui.screens.ZenDashboardScreen
 import com.vk.zenspend.ui.screens.ZenSpendViewModel
+import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenSpendTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +33,31 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ZenSpendTheme {
-                ZenSpendRootScreen(viewModel = viewModel)
+                val isSplashVisible by viewModel.isSplashVisible.collectAsState()
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = PorcelainBg
+                ) {
+                    AnimatedContent(
+                        targetState = isSplashVisible,
+                        transitionSpec = {
+                            fadeIn(animationSpec = ZenMotion.DefaultSpring) togetherWith
+                                    fadeOut(animationSpec = ZenMotion.DefaultSpring)
+                        },
+                        label = "splashTransition"
+                    ) { showSplash ->
+                        if (showSplash) {
+                            SplashScreen(
+                                onTimeout = {
+                                    viewModel.dismissSplash()
+                                }
+                            )
+                        } else {
+                            ZenDashboardScreen(viewModel = viewModel)
+                        }
+                    }
+                }
             }
         }
     }

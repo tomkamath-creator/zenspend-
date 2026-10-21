@@ -4,18 +4,25 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Porcelain Background -->
+    <!-- Porcelain Background with Soft Radial Depth -->
     <path
         android:fillColor="#F8F9FA"
         android:pathData="M0,0h108v108h-108z" />
     
-    <!-- Calming Sage & Porcelain Ambient Glow -->
+    <!-- Outer Gentle Aura Ring (Soft Pastel Sage) -->
     <path
         android:fillColor="#E8F5E9"
-        android:pathData="M54,18 C73.88,18 90,34.12 90,54 C90,73.88 73.88,90 54,90 C34.12,90 18,73.88 18,54 C18,34.12 34.12,18 54,18 Z" />
+        android:pathData="M54,12 C77.2,12 96,30.8 96,54 C96,77.2 77.2,96 54,96 C30.8,96 12,77.2 12,54 C12,30.8 30.8,12 54,12 Z" />
     
-    <!-- Outer Soft Wave -->
+    <!-- Inner Radiant Halo (Soft Mint/Porcelain) -->
     <path
-        android:fillColor="#E0F2F1"
-        android:pathData="M54,26 C69.46,26 82,38.54 82,54 C82,69.46 69.46,82 54,82 C38.54,82 26,69.46 26,54 C26,38.54 38.54,26 54,26 Z" />
+        android:fillColor="#D8F3DC"
+        android:pathData="M54,20 C72.78,20 88,35.22 88,54 C88,72.78 72.78,88 54,88 C35.22,88 20,72.78 20,54 C20,35.22 35.22,20 54,20 Z" />
+
+    <!-- Subtle Golden Prosperity Accent Ring -->
+    <path
+        android:strokeColor="#FEE440"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.4"
+        android:pathData="M54,24 C70.57,24 84,37.43 84,54 C84,70.57 70.57,84 54,84 C37.43,84 24,70.57 24,54 C24,37.43 37.43,24 54,24 Z" />
 </vector>
