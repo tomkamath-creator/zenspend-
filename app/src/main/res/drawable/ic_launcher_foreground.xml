@@ -21,47 +21,63 @@
         android:strokeColor="#FFB703"
         android:strokeWidth="2.0"
         android:strokeLineCap="round"
-        android:pathData="M38,36 L48,36" />
+        android:pathData="M36,36 L48,36" />
     <!-- Second Horizontal Bar -->
     <path
         android:strokeColor="#FFB703"
         android:strokeWidth="2.0"
         android:strokeLineCap="round"
-        android:pathData="M38,40 L46,40" />
+        android:pathData="M36,40 L46,40" />
     <!-- Loop & Stem -->
     <path
         android:strokeColor="#FFB703"
         android:strokeWidth="2.0"
         android:strokeLineCap="round"
-        android:pathData="M42,36 C47,36 47,43 42,43 L40,43" />
+        android:pathData="M40,36 C46,36 46,43 40,43 L38,43" />
     <!-- Downward Diagonal Leg -->
     <path
         android:strokeColor="#FFB703"
         android:strokeWidth="2.0"
         android:strokeLineCap="round"
-        android:pathData="M42,43 L48,48" />
+        android:pathData="M40,43 L47,48" />
 
     <!-- Digital Amount Indicator Ticker Line -->
     <path
         android:strokeColor="#2D6A4F"
-        android:strokeWidth="2.2"
+        android:strokeWidth="2.4"
         android:strokeLineCap="round"
         android:pathData="M54,42 L76,42" />
 
-    <!-- Calculator Keypad Grid -->
-    <!-- Row 1 Buttons -->
-    <circle android:cx="34" android:cy="59" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="48" android:cy="59" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="62" android:cy="59" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="75" android:cy="59" android:r="5.5" android:fillColor="#FFB703" />
+    <!-- Calculator Keypad Grid using standard Path data -->
+    <!-- Row 1 Keys -->
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M30,59 A4,4 0 1,0 38,59 A4,4 0 1,0 30,59 Z" />
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M44,59 A4,4 0 1,0 52,59 A4,4 0 1,0 44,59 Z" />
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M58,59 A4,4 0 1,0 66,59 A4,4 0 1,0 58,59 Z" />
+    <path
+        android:fillColor="#FFB703"
+        android:pathData="M71,59 A4,4 0 1,0 79,59 A4,4 0 1,0 71,59 Z" />
 
-    <!-- Row 2 Buttons -->
-    <circle android:cx="34" android:cy="72" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="48" android:cy="72" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="62" android:cy="72" android:r="5.5" android:fillColor="#52B788" />
-    <circle android:cx="75" android:cy="72" android:r="5.5" android:fillColor="#FFB703" />
+    <!-- Row 2 Keys -->
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M30,71 A4,4 0 1,0 38,71 A4,4 0 1,0 30,71 Z" />
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M44,71 A4,4 0 1,0 52,71 A4,4 0 1,0 44,71 Z" />
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M58,71 A4,4 0 1,0 66,71 A4,4 0 1,0 58,71 Z" />
+    <path
+        android:fillColor="#FFB703"
+        android:pathData="M71,71 A4,4 0 1,0 79,71 A4,4 0 1,0 71,71 Z" />
 
-    <!-- Row 3 Buttons: Equal Key Bar (Mint Pastel Accent) -->
+    <!-- Row 3 Equals Key Bar (Mint Pastel Accent) -->
     <path
         android:fillColor="#74C69D"
         android:pathData="M30,80 L76,80 A4,4 0 0 1 80,84 L80,85 A4,4 0 0 1 76,89 L30,89 A4,4 0 0 1 26,85 L26,84 A4,4 0 0 1 30,80 Z" />
@@ -70,5 +86,5 @@
         android:strokeColor="#FFFFFF"
         android:strokeWidth="1.6"
         android:strokeLineCap="round"
-        android:pathData="M50,83.5 L58,83.5 M50,86 L58,86" />
+        android:pathData="M49,83.5 L57,83.5 M49,86 L57,86" />
 </vector>
