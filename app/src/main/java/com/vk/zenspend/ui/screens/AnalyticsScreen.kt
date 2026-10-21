@@ -48,6 +48,12 @@ import com.vk.zenspend.ui.components.MorphingDonutChart
 import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.ApricotCaution
 import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
@@ -80,7 +86,7 @@ fun AnalyticsScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(PorcelainBg),
+            .background(ZenColorBackground),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -108,8 +114,8 @@ fun AnalyticsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(ZenPillShape)
-                    .background(Color.White)
-                    .border(1.dp, ZenCardBorder, ZenPillShape)
+                    .background(ZenColorSurface)
+                    .border(1.dp, ZenColorBorder, ZenPillShape)
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {

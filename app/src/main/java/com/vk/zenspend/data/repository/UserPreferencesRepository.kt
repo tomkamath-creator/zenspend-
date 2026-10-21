@@ -25,6 +25,20 @@ class UserPreferencesRepository @Inject constructor(
     )
     val hasCompletedOnboarding: StateFlow<Boolean> = _hasCompletedOnboarding.asStateFlow()
 
+    private val _isDarkMode = MutableStateFlow<Boolean?>(
+        if (prefs.contains(KEY_DARK_MODE)) prefs.getBoolean(KEY_DARK_MODE, false) else null
+    )
+    val isDarkMode: StateFlow<Boolean?> = _isDarkMode.asStateFlow()
+
+    fun setDarkMode(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_DARK_MODE, enabled).apply()
+        _isDarkMode.value = enabled
+    }
+
+    fun toggleDarkMode(currentIsDark: Boolean) {
+        setDarkMode(!currentIsDark)
+    }
+
     fun saveUserProfile(name: String, salary: Double) {
         prefs.edit()
             .putString(KEY_USER_NAME, name.trim())
@@ -52,5 +66,6 @@ class UserPreferencesRepository @Inject constructor(
         private const val KEY_USER_NAME = "key_user_name"
         private const val KEY_MONTHLY_SALARY = "key_monthly_salary"
         private const val KEY_HAS_COMPLETED_ONBOARDING = "key_has_completed_onboarding"
+        private const val KEY_DARK_MODE = "key_dark_mode"
     }
 }

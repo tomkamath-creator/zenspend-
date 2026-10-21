@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
@@ -18,7 +19,7 @@ import com.vk.zenspend.ui.screens.InteractiveOnboardingScreen
 import com.vk.zenspend.ui.screens.MainAppScaffold
 import com.vk.zenspend.ui.screens.SplashScreen
 import com.vk.zenspend.ui.screens.ZenSpendViewModel
-import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenSpendTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,13 +34,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            ZenSpendTheme {
+            val isDarkModePreference by viewModel.isDarkMode.collectAsState()
+            val systemIsDark = isSystemInDarkTheme()
+            val activeDarkMode = isDarkModePreference ?: systemIsDark
+
+            ZenSpendTheme(darkTheme = activeDarkMode) {
                 val isSplashVisible by viewModel.isSplashVisible.collectAsState()
                 val hasCompletedOnboarding by viewModel.hasCompletedOnboarding.collectAsState()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = PorcelainBg
+                    color = ZenColorBackground
                 ) {
                     AnimatedContent(
                         targetState = isSplashVisible,

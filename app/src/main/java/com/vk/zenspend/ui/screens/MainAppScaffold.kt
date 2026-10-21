@@ -48,6 +48,12 @@ import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -67,7 +73,7 @@ fun MainAppScaffold(
     val haptic = LocalHapticFeedback.current
 
     Scaffold(
-        containerColor = PorcelainBg,
+        containerColor = ZenColorBackground,
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -84,8 +90,8 @@ fun MainAppScaffold(
                             ambientColor = Color.Black.copy(alpha = 0.08f)
                         )
                         .clip(RoundedCornerShape(26.dp))
-                        .background(Color.White)
-                        .border(1.dp, ZenCardBorder.copy(alpha = 0.8f), RoundedCornerShape(26.dp))
+                        .background(ZenColorSurface)
+                        .border(1.dp, ZenColorBorder.copy(alpha = 0.8f), RoundedCornerShape(26.dp))
                         .padding(horizontal = 6.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -166,8 +172,8 @@ private fun NavTabItem(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isSelected) SagePastel else Color.Transparent
-    val contentColor = if (isSelected) SagePrimary else ZenTextMuted
+    val bgColor = if (isSelected) ZenColorSagePastel else Color.Transparent
+    val contentColor = if (isSelected) ZenColorSagePrimary else ZenColorTextMuted
 
     Column(
         modifier = modifier

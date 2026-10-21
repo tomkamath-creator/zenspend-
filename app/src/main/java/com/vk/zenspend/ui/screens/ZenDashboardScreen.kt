@@ -26,10 +26,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Spa
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -111,7 +119,7 @@ fun ZenDashboardScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = PorcelainBg,
+        containerColor = ZenColorBackground,
         floatingActionButton = {
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
@@ -174,6 +182,28 @@ fun ZenDashboardScreen(
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            val isDarkTheme = LocalIsDarkTheme.current
+                            IconButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    viewModel.toggleDarkMode(isDarkTheme)
+                                },
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(ZenColorSurface)
+                                    .border(1.dp, ZenColorBorder, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = if (isDarkTheme) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                    contentDescription = "Toggle Dark/Light Mode",
+                                    tint = if (isDarkTheme) Color(0xFFFFD166) else SagePrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
                             // Set Budget Pill Button
                             Box(
                                 modifier = Modifier

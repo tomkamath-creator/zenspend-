@@ -56,6 +56,11 @@ class ZenSpendViewModel @Inject constructor(
     val userName: StateFlow<String> = userPreferencesRepository.userName
     val monthlySalary: StateFlow<Double> = userPreferencesRepository.monthlySalary
     val hasCompletedOnboarding: StateFlow<Boolean> = userPreferencesRepository.hasCompletedOnboarding
+    val isDarkMode: StateFlow<Boolean?> = userPreferencesRepository.isDarkMode
+
+    fun toggleDarkMode(currentIsDark: Boolean) {
+        userPreferencesRepository.toggleDarkMode(currentIsDark)
+    }
 
     fun completeOnboarding(name: String, salary: Double, budget: Double, initialEmi: Emi?) {
         viewModelScope.launch {

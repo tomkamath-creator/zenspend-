@@ -63,6 +63,12 @@ import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.ApricotCaution
 import com.vk.zenspend.ui.theme.ApricotPastel
 import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
@@ -101,7 +107,7 @@ fun BudgetAndEmiScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(PorcelainBg),
+            .background(ZenColorBackground),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

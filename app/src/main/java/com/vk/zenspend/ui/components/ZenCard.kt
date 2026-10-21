@@ -11,20 +11,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.vk.zenspend.ui.theme.ZenCardBorder
 import com.vk.zenspend.ui.theme.ZenCardShape
-import com.vk.zenspend.ui.theme.ZenWhite
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
 
 /**
- * Surface Card: Pure white with subtle layered ambient shadows
- * (elevation 2.dp to 6.dp) and soft 24dp rounded corners.
+ * Surface Card: Adapts seamlessly to Light and Dark mode
+ * with subtle layered ambient elevation and soft 24dp rounded corners.
  */
 @Composable
 fun ZenCard(
     modifier: Modifier = Modifier,
     elevation: Dp = 3.dp,
-    containerColor: Color = ZenWhite,
-    borderColor: Color = ZenCardBorder.copy(alpha = 0.5f),
+    containerColor: Color = ZenColorSurface,
+    borderColor: Color = ZenColorBorder.copy(alpha = 0.6f),
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(

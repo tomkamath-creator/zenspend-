@@ -48,6 +48,12 @@ import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.ui.components.ReceiptViewerModal
 import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
@@ -74,7 +80,7 @@ fun ExpensesLedgerScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(PorcelainBg),
+            .background(ZenColorBackground),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
@@ -113,8 +119,8 @@ fun ExpensesLedgerScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = SageAccent,
                     unfocusedBorderColor = ZenCardBorder,
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
+                    focusedContainerColor = ZenColorSurface,
+                    unfocusedContainerColor = ZenColorSurface
                 ),
                 singleLine = true
             )
