@@ -24,7 +24,7 @@ class AnalyticsModelTest {
 
         assertEquals("Mindful Dining", cat.categoryName)
         assertEquals(3500.0, cat.amount, 0.001)
-        assertEquals(0.35f, cat.percentage, 0.001f)
+        assertEquals(0.35, cat.percentage.toDouble(), 0.001)
     }
 
     @Test
