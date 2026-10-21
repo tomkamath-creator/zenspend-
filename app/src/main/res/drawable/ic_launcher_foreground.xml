@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Zen Balance Stones & Growth Ring -->
+    <!-- Base Large Stone (Muted Sage) -->
+    <path
+        android:fillColor="#2D6A4F"
+        android:pathData="M32,68 C32,62 76,62 76,68 C76,74 32,74 32,68 Z" />
+    
+    <!-- Middle Stone (Fresh Sage) -->
+    <path
+        android:fillColor="#52B788"
+        android:pathData="M38,55 C38,50 70,50 70,55 C70,60 38,60 38,55 Z" />
+    
+    <!-- Top Stone (Warm Amber/Gold Accent) -->
+    <path
+        android:fillColor="#E9C46A"
+        android:pathData="M45,43 C45,39 63,39 63,43 C63,47 45,47 45,43 Z" />
+
+    <!-- Lotus / Leaf Bud of Prosperity -->
+    <path
+        android:fillColor="#2A9D8F"
+        android:pathData="M54,30 C56,33 58,37 54,39 C50,37 52,33 54,30 Z" />
+
+    <!-- Modern Minimalist VK Monogram / Seal -->
+    <!-- 'V' stroke -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M48,65 L52,70 L56,65" />
+    
+    <!-- 'K' stroke -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M58,65 L58,70 M62,65 L58,67.5 L62,70" />
+</vector>

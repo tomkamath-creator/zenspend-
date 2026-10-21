@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Porcelain Background -->
+    <path
+        android:fillColor="#F8F9FA"
+        android:pathData="M0,0h108v108h-108z" />
+    
+    <!-- Calming Sage & Porcelain Ambient Glow -->
+    <path
+        android:fillColor="#E8F5E9"
+        android:pathData="M54,18 C73.88,18 90,34.12 90,54 C90,73.88 73.88,90 54,90 C34.12,90 18,73.88 18,54 C18,34.12 34.12,18 54,18 Z" />
+    
+    <!-- Outer Soft Wave -->
+    <path
+        android:fillColor="#E0F2F1"
+        android:pathData="M54,26 C69.46,26 82,38.54 82,54 C82,69.46 69.46,82 54,82 C38.54,82 26,69.46 26,54 C26,38.54 38.54,26 54,26 Z" />
+</vector>
