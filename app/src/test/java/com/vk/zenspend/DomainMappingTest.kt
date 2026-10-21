@@ -51,7 +51,7 @@ class DomainMappingTest {
 
         val domain = entity.toDomain()
         assertEquals("Health & Wellness", domain.name)
-        assertEquals(150.0, domain.monthlyBudgetLimit)
+        assertEquals(150.0, domain.monthlyBudgetLimit ?: 0.0, 0.001)
 
         val backToEntity = domain.toEntity()
         assertEquals(entity, backToEntity)
