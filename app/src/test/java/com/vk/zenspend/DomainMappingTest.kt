@@ -2,6 +2,7 @@ package com.vk.zenspend
 
 import com.vk.zenspend.data.local.entity.CategoryEntity
 import com.vk.zenspend.data.local.entity.DebtEntity
+import com.vk.zenspend.data.local.entity.EmiEntity
 import com.vk.zenspend.data.local.entity.TransactionEntity
 import com.vk.zenspend.data.mapper.toDomain
 import com.vk.zenspend.data.mapper.toEntity
@@ -79,11 +80,10 @@ class DomainMappingTest {
         val backToEntity = domain.toEntity()
         assertEquals(entity, backToEntity)
     }
-}
 
     @Test
     fun emiEntity_toDomainAndBack_preservesData() {
-        val entity = com.vk.zenspend.data.local.entity.EmiEntity(
+        val entity = EmiEntity(
             id = 5L,
             title = "iPhone 15 EMI",
             monthlyAmount = 2499.0,
@@ -101,3 +101,4 @@ class DomainMappingTest {
         val backToEntity = domain.toEntity()
         assertEquals(entity, backToEntity)
     }
+}
