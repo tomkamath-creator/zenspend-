@@ -219,7 +219,7 @@ fun AnalyticsScreen(
                     val summaryColor = if (comparison.isMoreSpent) {
                         TerracottaAlert
                     } else {
-                        if (isDark) DarkSagePrimary else SagePrimary
+                        ZenColorSagePrimary
                     }
 
                     Text(

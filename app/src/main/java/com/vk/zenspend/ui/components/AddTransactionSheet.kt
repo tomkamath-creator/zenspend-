@@ -54,6 +54,7 @@ import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.domain.util.MathEvaluator
 import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
 import com.vk.zenspend.ui.theme.DarkTerracottaPastel
 import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
