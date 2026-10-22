@@ -57,6 +57,7 @@ import com.vk.zenspend.ui.theme.SkyBluePastel
 import com.vk.zenspend.ui.theme.SkyBluePastelBg
 import com.vk.zenspend.ui.theme.TerracottaAlert
 import com.vk.zenspend.ui.theme.TerracottaPastel
+import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -79,7 +80,7 @@ fun ZenSpendRootScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PorcelainBg)
+            .background(ZenColorBackground)
             .statusBarsPadding()
     ) {
         LazyColumn(

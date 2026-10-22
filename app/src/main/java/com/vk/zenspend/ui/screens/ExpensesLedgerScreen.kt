@@ -50,6 +50,8 @@ import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
 import com.vk.zenspend.ui.theme.ZenColorSurface
 import com.vk.zenspend.ui.theme.ZenColorTextMuted
 import com.vk.zenspend.ui.theme.ZenColorTextPrimary
@@ -117,8 +119,10 @@ fun ExpensesLedgerScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder,
+                    unfocusedBorderColor = ZenColorBorder,
                     focusedContainerColor = ZenColorSurface,
                     unfocusedContainerColor = ZenColorSurface
                 ),
@@ -134,8 +138,8 @@ fun ExpensesLedgerScreen(
                     Box(
                         modifier = Modifier
                             .clip(ZenPillShape)
-                            .background(if (isSelected) SagePrimary else Color.White)
-                            .border(1.dp, if (isSelected) SagePrimary else ZenCardBorder, ZenPillShape)
+                            .background(if (isSelected) ZenColorSagePrimary else ZenColorSurface)
+                            .border(1.dp, if (isSelected) ZenColorSagePrimary else ZenColorBorder, ZenPillShape)
                             .clickable { selectedFilter = filter }
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
@@ -273,7 +277,7 @@ private fun LedgerItemRow(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .clip(ZenPillShape)
-                        .background(SagePastel)
+                        .background(ZenColorSagePastel)
                         .border(1.dp, SageAccent.copy(alpha = 0.5f), ZenPillShape)
                         .clickable { onViewReceipt(transaction.receiptImagePath) }
                         .padding(horizontal = 9.dp, vertical = 5.dp)
@@ -282,7 +286,7 @@ private fun LedgerItemRow(
                         Icon(
                             imageVector = Icons.Default.ReceiptLong,
                             contentDescription = "View Bill",
-                            tint = SagePrimary,
+                            tint = ZenColorSagePrimary,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -290,7 +294,7 @@ private fun LedgerItemRow(
                             text = "View Bill 📷",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = SagePrimary
+                            color = ZenColorSagePrimary
                         )
                     }
                 }

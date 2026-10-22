@@ -50,9 +50,9 @@ val WarmSandPastel = Color(0xFFD69E2E)
 val WarmSandPastelBg = Color(0xFFFEFCBF)
 
 // Light Text Typography Colors
-val ZenTextPrimary = Color(0xFF1A202C)
-val ZenTextSecondary = Color(0xFF718096)
-val ZenTextMuted = Color(0xFFA0AEC0)
+val LightTextPrimary = Color(0xFF1A202C)
+val LightTextSecondary = Color(0xFF64748B)
+val LightTextMuted = Color(0xFF94A3B8)
 val ZenTextInverse = Color(0xFFFFFFFF)
 
 // Dark Text Typography Colors

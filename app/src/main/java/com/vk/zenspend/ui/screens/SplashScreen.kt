@@ -24,9 +24,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vk.zenspend.ui.components.ZenLogo
+import com.vk.zenspend.ui.theme.DarkBackground
+import com.vk.zenspend.ui.theme.DarkCardBorder
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.DarkSurface
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextPrimary
@@ -48,18 +54,29 @@ fun SplashScreen(
         onTimeout()
     }
 
+    val isDark = LocalIsDarkTheme.current
+    val gradientColors = if (isDark) {
+        listOf(
+            Color(0xFF161920),
+            DarkBackground,
+            Color(0xFF0F172A)
+        )
+    } else {
+        listOf(
+            Color(0xFFFAFBFC),
+            PorcelainBg,
+            SagePastel.copy(alpha = 0.4f)
+        )
+    }
+
+    val pillBg = if (isDark) DarkSurface else Color.White.copy(alpha = 0.95f)
+    val pillBorder = if (isDark) DarkCardBorder else Color.Transparent
+    val sageColor = if (isDark) DarkSagePrimary else SagePrimary
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFFAFBFC),
-                        PorcelainBg,
-                        SagePastel.copy(alpha = 0.4f)
-                    )
-                )
-            ),
+            .background(Brush.verticalGradient(colors = gradientColors)),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -88,7 +105,7 @@ fun SplashScreen(
                 text = "Expense & EMI Calculator",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = SagePrimary
+                color = sageColor
             )
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -96,14 +113,14 @@ fun SplashScreen(
             Box(
                 modifier = Modifier
                     .clip(ZenPillShape)
-                    .background(Color.White.copy(alpha = 0.95f))
+                    .background(pillBg)
                     .padding(horizontal = 20.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = "by VK",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = SagePrimary,
+                    color = sageColor,
                     letterSpacing = 0.8.sp
                 )
             }

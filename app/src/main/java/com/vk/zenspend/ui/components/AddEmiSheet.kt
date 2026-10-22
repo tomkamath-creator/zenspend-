@@ -39,6 +39,12 @@ import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenBottomSheetShape
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.ZenTextMuted
 import com.vk.zenspend.ui.theme.ZenTextPrimary
 import com.vk.zenspend.ui.theme.ZenTextSecondary
@@ -55,18 +61,29 @@ fun AddEmiSheet(
     var dueDayText by remember { mutableStateOf("5") }
     var tenureText by remember { mutableStateOf("") }
 
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = ZenColorTextPrimary,
+        unfocusedTextColor = ZenColorTextPrimary,
+        focusedBorderColor = SageAccent,
+        unfocusedBorderColor = ZenColorBorder,
+        focusedContainerColor = ZenColorSurfaceVariant,
+        unfocusedContainerColor = ZenColorSurfaceVariant,
+        focusedLabelColor = SageAccent,
+        unfocusedLabelColor = ZenColorTextSecondary
+    )
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = ZenBottomSheetShape,
-        containerColor = Color.White,
+        containerColor = ZenColorSurface,
         dragHandle = {
             Box(
                 modifier = Modifier
                     .padding(top = 12.dp, bottom = 8.dp)
                     .size(width = 36.dp, height = 4.dp)
                     .clip(CircleShape)
-                    .background(ZenCardBorder)
+                    .background(ZenColorBorder)
             )
         }
     ) {
@@ -98,12 +115,7 @@ fun AddEmiSheet(
                 placeholder = { Text("e.g. Phone EMI", color = ZenTextMuted) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder,
-                    focusedContainerColor = PorcelainBg,
-                    unfocusedContainerColor = PorcelainBg
-                ),
+                colors = textFieldColors,
                 singleLine = true
             )
 
@@ -114,16 +126,11 @@ fun AddEmiSheet(
                 value = amountText,
                 onValueChange = { if (it.all { c -> c.isDigit() || c == '.' }) amountText = it },
                 label = { Text("Monthly Amount (₹)") },
-                prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = SagePrimary) },
+                prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = ZenColorSagePrimary) },
                 placeholder = { Text("e.g. 2499", color = ZenTextMuted) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder,
-                    focusedContainerColor = PorcelainBg,
-                    unfocusedContainerColor = PorcelainBg
-                ),
+                colors = textFieldColors,
                 singleLine = true
             )
 
@@ -140,12 +147,7 @@ fun AddEmiSheet(
                     placeholder = { Text("5", color = ZenTextMuted) },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = SageAccent,
-                        unfocusedBorderColor = ZenCardBorder,
-                        focusedContainerColor = PorcelainBg,
-                        unfocusedContainerColor = PorcelainBg
-                    ),
+                    colors = textFieldColors,
                     singleLine = true
                 )
 
@@ -158,12 +160,7 @@ fun AddEmiSheet(
                     placeholder = { Text("e.g. 12", color = ZenTextMuted) },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = SageAccent,
-                        unfocusedBorderColor = ZenCardBorder,
-                        focusedContainerColor = PorcelainBg,
-                        unfocusedContainerColor = PorcelainBg
-                    ),
+                    colors = textFieldColors,
                     singleLine = true
                 )
             }
@@ -193,7 +190,10 @@ fun AddEmiSheet(
                     .height(52.dp),
                 enabled = title.isNotBlank() && (amountText.toDoubleOrNull() ?: 0.0) > 0,
                 shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SagePrimary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ZenColorSagePrimary,
+                    disabledContainerColor = ZenColorSurfaceVariant
+                )
             ) {
                 Text(
                     text = "Save EMI",

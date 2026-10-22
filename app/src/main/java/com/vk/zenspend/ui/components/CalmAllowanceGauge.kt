@@ -26,6 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.draw.clip
+import com.vk.zenspend.ui.theme.DarkApricotPastel
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.DarkTerracottaPastel
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenPillShape
 import androidx.compose.ui.draw.scale
@@ -128,16 +133,17 @@ fun CalmAllowanceGauge(
         label = "ripple2Alpha"
     )
 
+    val isDark = LocalIsDarkTheme.current
     val activeColor = when {
         spentSoFar > monthlyBudget -> TerracottaAlert
         progressFraction > 0.75f -> ApricotCaution
-        else -> SageAccent
+        else -> if (isDark) DarkSagePrimary else SageAccent
     }
 
     val activeGlow = when {
-        spentSoFar > monthlyBudget -> Color(0xFFFEECEB)
-        progressFraction > 0.75f -> Color(0xFFFFF4E5)
-        else -> SagePastel
+        spentSoFar > monthlyBudget -> if (isDark) DarkTerracottaPastel else Color(0xFFFEECEB)
+        progressFraction > 0.75f -> if (isDark) DarkApricotPastel else Color(0xFFFFF4E5)
+        else -> if (isDark) DarkSagePastel else SagePastel
     }
 
     Box(
@@ -235,14 +241,14 @@ fun CalmAllowanceGauge(
                 Box(
                     modifier = Modifier
                         .clip(ZenPillShape)
-                        .background(SagePastel)
+                        .background(if (isDark) DarkSagePastel else SagePastel)
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "Tap to set budget",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = SagePrimary
+                        color = if (isDark) DarkSagePrimary else SagePrimary
                     )
                 }
             } else {

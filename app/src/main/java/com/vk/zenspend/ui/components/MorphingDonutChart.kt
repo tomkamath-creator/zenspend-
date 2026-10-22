@@ -47,6 +47,8 @@ import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -81,8 +83,8 @@ fun MorphingDonutChart(
                 .fillMaxWidth()
                 .height(200.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(PorcelainBg)
-                .border(1.dp, ZenCardBorder, RoundedCornerShape(20.dp)),
+                .background(ZenColorSurfaceVariant)
+                .border(1.dp, ZenColorBorder, RoundedCornerShape(20.dp)),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -267,10 +269,10 @@ fun MorphingDonutChart(
                 Row(
                     modifier = Modifier
                         .clip(ZenPillShape)
-                        .background(if (isSelected) itemColor.copy(alpha = 0.18f) else PorcelainBg)
+                        .background(if (isSelected) itemColor.copy(alpha = 0.18f) else ZenColorSurfaceVariant)
                         .border(
                             width = 1.dp,
-                            color = if (isSelected) itemColor else ZenCardBorder,
+                            color = if (isSelected) itemColor else ZenColorBorder,
                             shape = ZenPillShape
                         )
                         .clickable {

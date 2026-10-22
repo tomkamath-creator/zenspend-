@@ -33,50 +33,10 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Spa
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.DarkTerracottaPastel
 import com.vk.zenspend.ui.theme.LocalIsDarkTheme
-import com.vk.zenspend.ui.theme.ZenColorBackground
-import com.vk.zenspend.ui.theme.ZenColorBorder
-import com.vk.zenspend.ui.theme.ZenColorSurface
-import com.vk.zenspend.ui.theme.ZenColorTextPrimary
-import com.vk.zenspend.ui.theme.ZenColorTextSecondary
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.vk.zenspend.domain.model.Transaction
-import com.vk.zenspend.domain.model.TransactionType
-import com.vk.zenspend.ui.components.AddTransactionSheet
-import com.vk.zenspend.ui.components.CalmAllowanceGauge
-import com.vk.zenspend.ui.components.ReceiptViewerModal
-import com.vk.zenspend.ui.components.RollingTickerText
-import com.vk.zenspend.ui.components.SetBudgetSheet
-import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
@@ -84,6 +44,14 @@ import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.TerracottaAlert
 import com.vk.zenspend.ui.theme.TerracottaPastel
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -137,7 +105,7 @@ fun ZenDashboardScreen(
                 },
                 modifier = Modifier.scale(fabScale),
                 shape = CircleShape,
-                containerColor = SagePrimary,
+                containerColor = ZenColorSagePrimary,
                 contentColor = Color.White,
                 elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
                 interactionSource = interactionSource
@@ -209,7 +177,7 @@ fun ZenDashboardScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(ZenPillShape)
-                                    .background(SagePastel)
+                                    .background(ZenColorSagePastel)
                                     .clickable { isSetBudgetOpen = true }
                                     .padding(horizontal = 12.dp, vertical = 7.dp)
                             ) {
@@ -217,7 +185,7 @@ fun ZenDashboardScreen(
                                     Icon(
                                         imageVector = Icons.Default.Edit,
                                         contentDescription = "Set Budget",
-                                        tint = SagePrimary,
+                                        tint = ZenColorSagePrimary,
                                         modifier = Modifier.size(13.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
@@ -225,7 +193,7 @@ fun ZenDashboardScreen(
                                         text = if (monthlyBudget > 0) "Budget: ₹%,.0f".format(monthlyBudget) else "Set Budget",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = SagePrimary
+                                        color = ZenColorSagePrimary
                                     )
                                 }
                             }
@@ -245,7 +213,7 @@ fun ZenDashboardScreen(
                                     Icon(
                                         imageVector = Icons.Default.Spa,
                                         contentDescription = null,
-                                        tint = SagePrimary,
+                                        tint = ZenColorSagePrimary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -266,7 +234,7 @@ fun ZenDashboardScreen(
                                 androidx.compose.material3.Button(
                                     onClick = { isSetBudgetOpen = true },
                                     shape = ZenPillShape,
-                                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = SagePrimary),
+                                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = ZenColorSagePrimary),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Text(
@@ -358,13 +326,13 @@ fun ZenDashboardScreen(
                                     modifier = Modifier
                                         .size(56.dp)
                                         .clip(CircleShape)
-                                        .background(SagePastel),
+                                        .background(ZenColorSagePastel),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Spa,
                                         contentDescription = null,
-                                        tint = SagePrimary,
+                                        tint = ZenColorSagePrimary,
                                         modifier = Modifier.size(30.dp)
                                     )
                                 }
@@ -468,8 +436,17 @@ private fun MiniMetricBox(
     isExpense: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val bgColor = if (isExpense) TerracottaPastel else SagePastel
-    val textColor = if (isExpense) TerracottaAlert else SagePrimary
+    val isDark = LocalIsDarkTheme.current
+    val bgColor = if (isExpense) {
+        if (isDark) DarkTerracottaPastel else TerracottaPastel
+    } else {
+        if (isDark) DarkSagePastel else SagePastel
+    }
+    val textColor = if (isExpense) {
+        TerracottaAlert
+    } else {
+        if (isDark) DarkSagePrimary else SagePrimary
+    }
     val icon = if (isExpense) Icons.Default.ArrowDownward else Icons.Default.ArrowUpward
 
     Box(
@@ -568,7 +545,7 @@ private fun DashboardTransactionRow(
                     Icon(
                         imageVector = Icons.Default.ReceiptLong,
                         contentDescription = "View Bill",
-                        tint = SagePrimary,
+                        tint = ZenColorSagePrimary,
                         modifier = Modifier.size(18.dp)
                     )
                 }

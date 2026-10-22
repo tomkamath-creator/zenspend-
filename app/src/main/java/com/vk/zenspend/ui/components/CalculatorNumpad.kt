@@ -31,6 +31,12 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vk.zenspend.ui.theme.DarkCardBorder
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.DarkSurfaceVariant
+import com.vk.zenspend.ui.theme.DarkTerracottaPastel
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
@@ -120,6 +126,7 @@ private fun NumpadKey(
     onClick: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val isDark = LocalIsDarkTheme.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -130,16 +137,18 @@ private fun NumpadKey(
     )
 
     val bgColor = when {
-        isClear -> Color(0xFFFEECEB)
-        isOperator -> SagePastel
-        else -> Color.White
+        isClear -> if (isDark) DarkTerracottaPastel else Color(0xFFFEECEB)
+        isOperator -> if (isDark) DarkSagePastel else SagePastel
+        else -> if (isDark) DarkSurfaceVariant else Color.White
     }
 
     val textColor = when {
-        isClear -> Color(0xFFC53030)
-        isOperator -> SagePrimary
+        isClear -> if (isDark) Color(0xFFFF6B6B) else Color(0xFFC53030)
+        isOperator -> if (isDark) DarkSagePrimary else SagePrimary
         else -> ZenTextPrimary
     }
+
+    val borderColor = if (isDark) DarkCardBorder else ZenCardBorder.copy(alpha = 0.7f)
 
     Box(
         modifier = modifier
@@ -147,7 +156,7 @@ private fun NumpadKey(
             .scale(scale)
             .clip(RoundedCornerShape(18.dp))
             .background(bgColor)
-            .border(1.dp, ZenCardBorder.copy(alpha = 0.7f), RoundedCornerShape(18.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(18.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
@@ -172,6 +181,7 @@ private fun BackspaceKey(
     onClick: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val isDark = LocalIsDarkTheme.current
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
@@ -181,12 +191,16 @@ private fun BackspaceKey(
         label = "backspaceScale"
     )
 
+    val backspaceBg = if (isDark) DarkSurfaceVariant else PorcelainBg
+    val backspaceBorder = if (isDark) DarkCardBorder else ZenCardBorder
+    val contentColor = ZenTextPrimary.copy(alpha = 0.85f)
+
     Box(
         modifier = modifier
             .scale(scale)
             .clip(RoundedCornerShape(16.dp))
-            .background(PorcelainBg)
-            .border(1.dp, ZenCardBorder, RoundedCornerShape(16.dp))
+            .background(backspaceBg)
+            .border(1.dp, backspaceBorder, RoundedCornerShape(16.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
@@ -203,14 +217,14 @@ private fun BackspaceKey(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Backspace,
                 contentDescription = "Delete",
-                tint = ZenTextPrimary.copy(alpha = 0.7f),
+                tint = contentColor,
                 modifier = Modifier.padding(end = 6.dp)
             )
             Text(
                 text = "Delete",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = ZenTextPrimary.copy(alpha = 0.7f)
+                color = contentColor
             )
         }
     }

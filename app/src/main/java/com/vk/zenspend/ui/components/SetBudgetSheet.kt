@@ -41,6 +41,12 @@ import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenBottomSheetShape
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
 import com.vk.zenspend.ui.theme.ZenTextPrimary
@@ -60,14 +66,14 @@ fun SetBudgetSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = ZenBottomSheetShape,
-        containerColor = Color.White,
+        containerColor = ZenColorSurface,
         dragHandle = {
             Box(
                 modifier = Modifier
                     .padding(top = 12.dp, bottom = 8.dp)
                     .size(width = 36.dp, height = 4.dp)
                     .clip(CircleShape)
-                    .background(ZenCardBorder)
+                    .background(ZenColorBorder)
             )
         }
     ) {
@@ -104,24 +110,26 @@ fun SetBudgetSheet(
                         text = "₹ ",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = SagePrimary
+                        color = ZenColorSagePrimary
                     )
                 },
                 placeholder = { Text("e.g. 25000", color = ZenTextMuted) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder,
-                    focusedContainerColor = PorcelainBg,
-                    unfocusedContainerColor = PorcelainBg
+                    unfocusedBorderColor = ZenColorBorder,
+                    focusedContainerColor = ZenColorSurfaceVariant,
+                    unfocusedContainerColor = ZenColorSurfaceVariant
                 ),
                 singleLine = true
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Quick Preset Budget Chips (₹10,000, ₹25,000, ₹50,000, ₹1,00,000)
+            // Quick Preset Budget Chips (₹15,000, ₹25,000, ₹50,000, ₹1,00,000)
             Text(
                 text = "Quick Presets",
                 fontSize = 12.sp,
@@ -135,14 +143,15 @@ fun SetBudgetSheet(
             ) {
                 listOf(15000, 25000, 50000, 100000).forEach { preset ->
                     val label = if (preset >= 100000) "₹1 Lakh" else "₹${preset / 1000}k"
+                    val isSelected = amountInput == preset.toString()
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .clip(ZenPillShape)
-                            .background(if (amountInput == preset.toString()) SagePastel else PorcelainBg)
+                            .background(if (isSelected) ZenColorSagePastel else ZenColorSurfaceVariant)
                             .border(
                                 1.dp,
-                                if (amountInput == preset.toString()) SagePrimary else ZenCardBorder,
+                                if (isSelected) ZenColorSagePrimary else ZenColorBorder,
                                 ZenPillShape
                             )
                             .clickable { amountInput = preset.toString() }
@@ -153,7 +162,7 @@ fun SetBudgetSheet(
                             text = label,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (amountInput == preset.toString()) SagePrimary else ZenTextPrimary
+                            color = if (isSelected) ZenColorSagePrimary else ZenTextPrimary
                         )
                     }
                 }
@@ -171,7 +180,7 @@ fun SetBudgetSheet(
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SagePrimary)
+                colors = ButtonDefaults.buttonColors(containerColor = ZenColorSagePrimary)
             ) {
                 Text(
                     text = "Save Monthly Budget",

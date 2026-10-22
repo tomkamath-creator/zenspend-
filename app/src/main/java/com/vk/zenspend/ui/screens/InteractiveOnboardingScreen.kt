@@ -70,6 +70,13 @@ import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBackground
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -105,7 +112,7 @@ fun InteractiveOnboardingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(PorcelainBg)
+            .background(ZenColorBackground)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -137,7 +144,7 @@ fun InteractiveOnboardingScreen(
                                 .height(4.dp)
                                 .weight(1f)
                                 .clip(RoundedCornerShape(2.dp))
-                                .background(if (isPassed) SagePrimary else ZenCardBorder)
+                                .background(if (isPassed) ZenColorSagePrimary else ZenColorBorder)
                         )
                         if (i < 4) {
                             Spacer(modifier = Modifier.width(8.dp))
@@ -240,8 +247,8 @@ fun InteractiveOnboardingScreen(
                         .height(54.dp),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = SagePrimary,
-                        disabledContainerColor = SagePastel
+                        containerColor = ZenColorSagePrimary,
+                        disabledContainerColor = ZenColorSurfaceVariant
                     )
                 ) {
                     Row(
@@ -291,14 +298,14 @@ private fun StepNameQuestion(
         Box(
             modifier = Modifier
                 .clip(ZenPillShape)
-                .background(SagePastel)
+                .background(ZenColorSagePastel)
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
                 text = "Question 1 of 4",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = SagePrimary
+                color = ZenColorSagePrimary
             )
         }
 
@@ -334,14 +341,20 @@ private fun StepNameQuestion(
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Name",
-                        tint = SagePrimary
+                        tint = ZenColorSagePrimary
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder
+                    unfocusedBorderColor = ZenColorBorder,
+                    focusedContainerColor = ZenColorSurfaceVariant,
+                    unfocusedContainerColor = ZenColorSurfaceVariant,
+                    focusedLabelColor = SageAccent,
+                    unfocusedLabelColor = ZenColorTextSecondary
                 )
             )
         }
@@ -364,13 +377,13 @@ private fun StepSalaryQuestion(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(SagePastel),
+                .background(ZenColorSagePastel),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Savings,
                 contentDescription = "Salary",
-                tint = SagePrimary,
+                tint = ZenColorSagePrimary,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -380,14 +393,14 @@ private fun StepSalaryQuestion(
         Box(
             modifier = Modifier
                 .clip(ZenPillShape)
-                .background(SagePastel)
+                .background(ZenColorSagePastel)
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
                 text = "Question 2 of 4",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = SagePrimary
+                color = ZenColorSagePrimary
             )
         }
 
@@ -418,14 +431,20 @@ private fun StepSalaryQuestion(
                 onValueChange = onSalaryChange,
                 label = { Text("Monthly Salary (₹)") },
                 placeholder = { Text("50000") },
-                prefix = { Text("₹ ", fontWeight = FontWeight.Bold) },
+                prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = ZenColorSagePrimary) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder
+                    unfocusedBorderColor = ZenColorBorder,
+                    focusedContainerColor = ZenColorSurfaceVariant,
+                    unfocusedContainerColor = ZenColorSurfaceVariant,
+                    focusedLabelColor = SageAccent,
+                    unfocusedLabelColor = ZenColorTextSecondary
                 )
             )
 
@@ -477,13 +496,13 @@ private fun StepBudgetQuestion(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(SagePastel),
+                .background(ZenColorSagePastel),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.AccountBalanceWallet,
                 contentDescription = "Budget",
-                tint = SagePrimary,
+                tint = ZenColorSagePrimary,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -493,14 +512,14 @@ private fun StepBudgetQuestion(
         Box(
             modifier = Modifier
                 .clip(ZenPillShape)
-                .background(SagePastel)
+                .background(ZenColorSagePastel)
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
                 text = "Question 3 of 4",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = SagePrimary
+                color = ZenColorSagePrimary
             )
         }
 
@@ -531,14 +550,20 @@ private fun StepBudgetQuestion(
                 onValueChange = onBudgetChange,
                 label = { Text("Monthly Budget Limit (₹)") },
                 placeholder = { Text("25000") },
-                prefix = { Text("₹ ", fontWeight = FontWeight.Bold) },
+                prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = ZenColorSagePrimary) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder
+                    unfocusedBorderColor = ZenColorBorder,
+                    focusedContainerColor = ZenColorSurfaceVariant,
+                    unfocusedContainerColor = ZenColorSurfaceVariant,
+                    focusedLabelColor = SageAccent,
+                    unfocusedLabelColor = ZenColorTextSecondary
                 )
             )
 
@@ -596,6 +621,17 @@ private fun StepEmiQuestion(
 ) {
     val haptic = LocalHapticFeedback.current
 
+    val emiFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = ZenColorTextPrimary,
+        unfocusedTextColor = ZenColorTextPrimary,
+        focusedBorderColor = SageAccent,
+        unfocusedBorderColor = ZenColorBorder,
+        focusedContainerColor = ZenColorSurfaceVariant,
+        unfocusedContainerColor = ZenColorSurfaceVariant,
+        focusedLabelColor = SageAccent,
+        unfocusedLabelColor = ZenColorTextSecondary
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -604,13 +640,13 @@ private fun StepEmiQuestion(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(SagePastel),
+                .background(ZenColorSagePastel),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.CreditCard,
                 contentDescription = "EMI",
-                tint = SagePrimary,
+                tint = ZenColorSagePrimary,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -620,14 +656,14 @@ private fun StepEmiQuestion(
         Box(
             modifier = Modifier
                 .clip(ZenPillShape)
-                .background(SagePastel)
+                .background(ZenColorSagePastel)
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
                 text = "Question 4 of 4",
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = SagePrimary
+                color = ZenColorSagePrimary
             )
         }
 
@@ -689,10 +725,7 @@ private fun StepEmiQuestion(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SageAccent,
-                            unfocusedBorderColor = ZenCardBorder
-                        )
+                        colors = emiFieldColors
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -702,15 +735,12 @@ private fun StepEmiQuestion(
                         onValueChange = onEmiAmountChange,
                         label = { Text("Monthly EMI Amount (₹)") },
                         placeholder = { Text("5000") },
-                        prefix = { Text("₹ ", fontWeight = FontWeight.Bold) },
+                        prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = ZenColorSagePrimary) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SageAccent,
-                            unfocusedBorderColor = ZenCardBorder
-                        )
+                        colors = emiFieldColors
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -724,10 +754,7 @@ private fun StepEmiQuestion(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = SageAccent,
-                            unfocusedBorderColor = ZenCardBorder
-                        )
+                        colors = emiFieldColors
                     )
                 }
             }
@@ -745,10 +772,10 @@ private fun PresetChip(
     Box(
         modifier = modifier
             .clip(ZenPillShape)
-            .background(if (isSelected) SagePrimary else PorcelainBg)
+            .background(if (isSelected) ZenColorSagePrimary else ZenColorSurfaceVariant)
             .border(
                 1.dp,
-                if (isSelected) SagePrimary else ZenCardBorder,
+                if (isSelected) ZenColorSagePrimary else ZenColorBorder,
                 ZenPillShape
             )
             .clickable(onClick = onClick)

@@ -26,13 +26,23 @@ val ZenColorSurfaceVariant: Color
     @Composable get() = if (LocalIsDarkTheme.current) DarkSurfaceVariant else PorcelainBgSubtle
 
 val ZenColorTextPrimary: Color
-    @Composable get() = if (LocalIsDarkTheme.current) DarkTextPrimary else ZenTextPrimary
+    @Composable get() = if (LocalIsDarkTheme.current) DarkTextPrimary else LightTextPrimary
 
 val ZenColorTextSecondary: Color
-    @Composable get() = if (LocalIsDarkTheme.current) DarkTextSecondary else ZenTextSecondary
+    @Composable get() = if (LocalIsDarkTheme.current) DarkTextSecondary else LightTextSecondary
 
 val ZenColorTextMuted: Color
-    @Composable get() = if (LocalIsDarkTheme.current) DarkTextMuted else ZenTextMuted
+    @Composable get() = if (LocalIsDarkTheme.current) DarkTextMuted else LightTextMuted
+
+// Direct typography color aliases dynamically bound to active theme
+val ZenTextPrimary: Color
+    @Composable get() = ZenColorTextPrimary
+
+val ZenTextSecondary: Color
+    @Composable get() = ZenColorTextSecondary
+
+val ZenTextMuted: Color
+    @Composable get() = ZenColorTextMuted
 
 val ZenColorBorder: Color
     @Composable get() = if (LocalIsDarkTheme.current) DarkCardBorder else ZenCardBorder
@@ -43,6 +53,12 @@ val ZenColorSagePastel: Color
 val ZenColorSagePrimary: Color
     @Composable get() = if (LocalIsDarkTheme.current) DarkSagePrimary else SagePrimary
 
+val ZenColorTerracottaPastel: Color
+    @Composable get() = if (LocalIsDarkTheme.current) DarkTerracottaPastel else TerracottaPastel
+
+val ZenColorApricotPastel: Color
+    @Composable get() = if (LocalIsDarkTheme.current) DarkApricotPastel else ApricotPastel
+
 private val ZenLightColorScheme = lightColorScheme(
     primary = SagePrimary,
     onPrimary = ZenWhite,
@@ -52,20 +68,20 @@ private val ZenLightColorScheme = lightColorScheme(
     secondary = SkyBluePastel,
     onSecondary = ZenWhite,
     secondaryContainer = SkyBluePastelBg,
-    onSecondaryContainer = ZenTextPrimary,
+    onSecondaryContainer = LightTextPrimary,
 
     tertiary = LavenderPastel,
     onTertiary = ZenWhite,
     tertiaryContainer = LavenderPastelBg,
-    onTertiaryContainer = ZenTextPrimary,
+    onTertiaryContainer = LightTextPrimary,
 
     background = PorcelainBg,
-    onBackground = ZenTextPrimary,
+    onBackground = LightTextPrimary,
 
     surface = ZenWhite,
-    onSurface = ZenTextPrimary,
+    onSurface = LightTextPrimary,
     surfaceVariant = PorcelainBgSubtle,
-    onSurfaceVariant = ZenTextSecondary,
+    onSurfaceVariant = LightTextSecondary,
 
     outline = ZenCardBorder,
     outlineVariant = ZenDivider,

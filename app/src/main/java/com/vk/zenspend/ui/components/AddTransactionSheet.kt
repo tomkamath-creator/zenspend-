@@ -53,6 +53,9 @@ import com.vk.zenspend.domain.model.Category
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.domain.util.MathEvaluator
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkTerracottaPastel
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
@@ -61,6 +64,14 @@ import com.vk.zenspend.ui.theme.TerracottaAlert
 import com.vk.zenspend.ui.theme.TerracottaPastel
 import com.vk.zenspend.ui.theme.ZenBottomSheetShape
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
+import com.vk.zenspend.ui.theme.ZenColorTextMuted
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
+import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
 import com.vk.zenspend.ui.theme.ZenTextPrimary
@@ -97,14 +108,14 @@ fun AddTransactionSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = ZenBottomSheetShape,
-        containerColor = Color.White,
+        containerColor = ZenColorSurface,
         dragHandle = {
             Box(
                 modifier = Modifier
                     .padding(top = 12.dp, bottom = 8.dp)
                     .size(width = 36.dp, height = 4.dp)
                     .clip(CircleShape)
-                    .background(ZenCardBorder)
+                    .background(ZenColorBorder)
             )
         }
     ) {
@@ -131,8 +142,8 @@ fun AddTransactionSheet(
                 Row(
                     modifier = Modifier
                         .clip(ZenPillShape)
-                        .background(PorcelainBg)
-                        .border(1.dp, ZenCardBorder, ZenPillShape)
+                        .background(ZenColorSurfaceVariant)
+                        .border(1.dp, ZenColorBorder, ZenPillShape)
                         .padding(3.dp)
                 ) {
                     TypeToggleButton(
@@ -164,8 +175,8 @@ fun AddTransactionSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
-                    .background(PorcelainBg)
-                    .border(1.dp, ZenCardBorder, RoundedCornerShape(20.dp))
+                    .background(ZenColorSurfaceVariant)
+                    .border(1.dp, ZenColorBorder, RoundedCornerShape(20.dp))
                     .padding(horizontal = 18.dp, vertical = 12.dp)
             ) {
                 Column {
@@ -187,7 +198,7 @@ fun AddTransactionSheet(
                                 text = String.format(Locale.US, "= ₹%.2f", evaluatedAmount),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = SagePrimary
+                                color = ZenColorSagePrimary
                             )
                         }
                     }
@@ -196,7 +207,7 @@ fun AddTransactionSheet(
                         Text(
                             text = "Inline calculator active",
                             fontSize = 11.sp,
-                            color = SagePrimary
+                            color = ZenColorSagePrimary
                         )
                     }
                 }
@@ -218,10 +229,12 @@ fun AddTransactionSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = ZenColorTextPrimary,
+                    unfocusedTextColor = ZenColorTextPrimary,
                     focusedBorderColor = SageAccent,
-                    unfocusedBorderColor = ZenCardBorder,
-                    focusedContainerColor = PorcelainBg,
-                    unfocusedContainerColor = PorcelainBg
+                    unfocusedBorderColor = ZenColorBorder,
+                    focusedContainerColor = ZenColorSurfaceVariant,
+                    unfocusedContainerColor = ZenColorSurfaceVariant
                 ),
                 singleLine = true
             )
@@ -266,14 +279,14 @@ fun AddTransactionSheet(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(if (receiptUri != null) SagePastel else PorcelainBg)
-                                .border(1.dp, if (receiptUri != null) SageAccent else ZenCardBorder, RoundedCornerShape(10.dp)),
+                                .background(if (receiptUri != null) ZenColorSagePastel else ZenColorSurfaceVariant)
+                                .border(1.dp, if (receiptUri != null) SageAccent else ZenColorBorder, RoundedCornerShape(10.dp)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = if (receiptUri != null) Icons.Default.Check else Icons.Default.AddPhotoAlternate,
                                 contentDescription = "Bill Icon",
-                                tint = if (receiptUri != null) SagePrimary else ZenTextSecondary,
+                                tint = if (receiptUri != null) ZenColorSagePrimary else ZenTextSecondary,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -285,7 +298,7 @@ fun AddTransactionSheet(
                                 text = if (receiptUri != null) "✓ Bill / Invoice Attached" else "Attach Bill or Invoice Photo",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (receiptUri != null) SagePrimary else ZenTextPrimary
+                                color = if (receiptUri != null) ZenColorSagePrimary else ZenTextPrimary
                             )
                             Text(
                                 text = if (receiptUri != null) "Tap to change image" else "Upload receipt photo from gallery (Optional)",
@@ -311,14 +324,14 @@ fun AddTransactionSheet(
                         Box(
                             modifier = Modifier
                                 .clip(ZenPillShape)
-                                .background(SagePastel)
+                                .background(ZenColorSagePastel)
                                 .padding(horizontal = 10.dp, vertical = 5.dp)
                         ) {
                             Text(
                                 text = "Browse 📷",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = SagePrimary
+                                color = ZenColorSagePrimary
                             )
                         }
                     }
@@ -385,8 +398,8 @@ fun AddTransactionSheet(
                 enabled = (evaluatedAmount ?: 0.0) > 0.0,
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = SagePrimary,
-                    disabledContainerColor = PorcelainBg
+                    containerColor = ZenColorSagePrimary,
+                    disabledContainerColor = ZenColorSurfaceVariant
                 )
             ) {
                 Text(
@@ -414,10 +427,21 @@ private fun TypeToggleButton(
     activeBg: Color,
     onClick: () -> Unit
 ) {
+    val isDark = LocalIsDarkTheme.current
+    val resolvedBg = if (isSelected) {
+        if (isDark) {
+            if (activeColor == TerracottaAlert) DarkTerracottaPastel else DarkSagePastel
+        } else activeBg
+    } else Color.Transparent
+
+    val resolvedTextColor = if (isSelected) {
+        if (isDark && activeColor == SagePrimary) DarkSagePrimary else activeColor
+    } else ZenTextSecondary
+
     Box(
         modifier = Modifier
             .clip(ZenPillShape)
-            .background(if (isSelected) activeBg else Color.Transparent)
+            .background(resolvedBg)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
@@ -426,7 +450,7 @@ private fun TypeToggleButton(
             text = text,
             fontSize = 12.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) activeColor else ZenTextSecondary
+            color = resolvedTextColor
         )
     }
 }
@@ -437,8 +461,8 @@ private fun CategoryChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) SagePrimary else ZenCardBorder
-    val bgColor = if (isSelected) SagePastel else PorcelainBg
+    val borderColor = if (isSelected) ZenColorSagePrimary else ZenColorBorder
+    val bgColor = if (isSelected) ZenColorSagePastel else ZenColorSurfaceVariant
 
     Row(
         modifier = Modifier

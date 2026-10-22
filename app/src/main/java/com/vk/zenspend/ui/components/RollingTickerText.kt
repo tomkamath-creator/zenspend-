@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.vk.zenspend.ui.theme.ZenColorTextPrimary
 import com.vk.zenspend.ui.theme.ZenMotion
-import com.vk.zenspend.ui.theme.ZenTextPrimary
 import java.util.Locale
 
 /**
@@ -29,11 +29,11 @@ fun RollingTickerText(
     currencySymbol: String = "₹",
     textStyle: TextStyle = TextStyle(
         fontSize = 32.sp,
-        fontWeight = FontWeight.Bold,
-        color = ZenTextPrimary
+        fontWeight = FontWeight.Bold
     ),
-    textColor: Color = ZenTextPrimary
+    textColor: Color = Color.Unspecified
 ) {
+    val resolvedColor = if (textColor != Color.Unspecified) textColor else ZenColorTextPrimary
     val formattedString = String.format(Locale.US, "%s%.2f", currencySymbol, amount)
 
     Row(
@@ -56,7 +56,7 @@ fun RollingTickerText(
             ) { targetChar ->
                 Text(
                     text = targetChar.toString(),
-                    style = textStyle.copy(color = textColor)
+                    style = textStyle.copy(color = resolvedColor)
                 )
             }
         }

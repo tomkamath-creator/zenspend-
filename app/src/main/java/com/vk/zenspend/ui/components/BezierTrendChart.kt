@@ -41,11 +41,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vk.zenspend.domain.model.TrendPoint
+import com.vk.zenspend.ui.theme.DarkCardBorder
+import com.vk.zenspend.ui.theme.DarkSurface
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorSurface
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
@@ -70,6 +75,7 @@ fun BezierTrendChart(
 ) {
     var selectedIndex by remember { mutableIntStateOf(-1) }
     val haptic = LocalHapticFeedback.current
+    val isDark = LocalIsDarkTheme.current
 
     if (points.isEmpty()) {
         Box(
@@ -77,7 +83,7 @@ fun BezierTrendChart(
                 .fillMaxWidth()
                 .height(chartHeight)
                 .clip(RoundedCornerShape(20.dp))
-                .background(PorcelainBg),
+                .background(ZenColorSurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -104,7 +110,7 @@ fun BezierTrendChart(
                 Box(
                     modifier = Modifier
                         .clip(ZenPillShape)
-                        .background(Color.White)
+                        .background(ZenColorSurface)
                         .border(1.dp, lineColor.copy(alpha = 0.4f), ZenPillShape)
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
@@ -250,7 +256,7 @@ fun BezierTrendChart(
 
             // 3. Draw baseline
             drawLine(
-                color = ZenCardBorder,
+                color = if (isDark) DarkCardBorder else ZenCardBorder,
                 start = Offset(0f, height - padBottom),
                 end = Offset(width, height - padBottom),
                 strokeWidth = 1.dp.toPx()
@@ -276,7 +282,7 @@ fun BezierTrendChart(
                 )
                 // Solid center dot
                 drawCircle(
-                    color = Color.White,
+                    color = if (isDark) DarkSurface else Color.White,
                     radius = 5.dp.toPx(),
                     center = activeCoord
                 )

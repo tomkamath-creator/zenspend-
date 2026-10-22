@@ -63,6 +63,13 @@ import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.ApricotCaution
 import com.vk.zenspend.ui.theme.ApricotPastel
 import com.vk.zenspend.ui.theme.PorcelainBg
+import com.vk.zenspend.ui.theme.DarkApricotPastel
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
 import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenColorBorder
 import com.vk.zenspend.ui.theme.ZenColorSurface
@@ -151,14 +158,14 @@ fun BudgetAndEmiScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(ZenPillShape)
-                                    .background(SagePastel)
+                                    .background(ZenColorSagePastel)
                                     .padding(horizontal = 9.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = String.format(Locale.getDefault(), "Income: ₹%,.0f", monthlySalary),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = SagePrimary
+                                    color = ZenColorSagePrimary
                                 )
                             }
                         }
@@ -176,7 +183,7 @@ fun BudgetAndEmiScreen(
                                     text = String.format(Locale.getDefault(), "₹%,.0f", projectedSavings),
                                     fontSize = 17.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = SagePrimary
+                                    color = ZenColorSagePrimary
                                 )
                             }
                             Column(horizontalAlignment = Alignment.End) {
@@ -222,7 +229,7 @@ fun BudgetAndEmiScreen(
                     Box(
                         modifier = Modifier
                             .clip(ZenPillShape)
-                            .background(SagePastel)
+                            .background(ZenColorSagePastel)
                             .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 isSetBudgetOpen = true
@@ -233,7 +240,7 @@ fun BudgetAndEmiScreen(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit Budget",
-                                tint = SagePrimary,
+                                tint = ZenColorSagePrimary,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -241,7 +248,7 @@ fun BudgetAndEmiScreen(
                                 text = "Set Budget",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = SagePrimary
+                                color = ZenColorSagePrimary
                             )
                         }
                     }
@@ -257,7 +264,7 @@ fun BudgetAndEmiScreen(
                         .height(10.dp)
                         .clip(CircleShape),
                     color = if (budgetProgress > 0.85f) TerracottaAlert else SageAccent,
-                    trackColor = SagePastel,
+                    trackColor = ZenColorBorder,
                     strokeCap = StrokeCap.Round
                 )
 
@@ -276,7 +283,7 @@ fun BudgetAndEmiScreen(
                         text = String.format(Locale.US, "Left: ₹%.2f", maxOf(0.0, monthlyBudget - totalExpenses)),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (totalExpenses > monthlyBudget) TerracottaAlert else SagePrimary
+                        color = if (totalExpenses > monthlyBudget) TerracottaAlert else ZenColorSagePrimary
                     )
                 }
             }
@@ -316,7 +323,7 @@ fun BudgetAndEmiScreen(
                     modifier = Modifier
                         .scale(scale)
                         .clip(ZenPillShape)
-                        .background(SagePrimary)
+                        .background(ZenColorSagePrimary)
                         .clickable(
                             interactionSource = interactionSource,
                             indication = null
@@ -359,13 +366,13 @@ fun BudgetAndEmiScreen(
                             modifier = Modifier
                                 .size(50.dp)
                                 .clip(CircleShape)
-                                .background(SagePastel),
+                                .background(ZenColorSagePastel),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.CreditCard,
                                 contentDescription = null,
-                                tint = SagePrimary,
+                                tint = ZenColorSagePrimary,
                                 modifier = Modifier.size(26.dp)
                             )
                         }
@@ -432,6 +439,29 @@ private fun EmiCardItem(
     onDelete: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val isDark = LocalIsDarkTheme.current
+
+    val iconBg = if (emi.isPaidThisMonth) {
+        if (isDark) DarkSagePastel else SagePastel
+    } else {
+        if (isDark) DarkApricotPastel else ApricotPastel
+    }
+
+    val iconTint = if (emi.isPaidThisMonth) {
+        if (isDark) DarkSagePrimary else SagePrimary
+    } else ApricotCaution
+
+    val buttonBg = if (emi.isPaidThisMonth) {
+        if (isDark) DarkSagePastel else SagePastel
+    } else ZenColorSurfaceVariant
+
+    val buttonBorder = if (emi.isPaidThisMonth) {
+        if (isDark) DarkSagePrimary else SagePrimary
+    } else ZenColorBorder
+
+    val buttonText = if (emi.isPaidThisMonth) {
+        if (isDark) DarkSagePrimary else SagePrimary
+    } else ZenTextSecondary
 
     ZenCard(
         modifier = Modifier.fillMaxWidth(),
@@ -446,13 +476,13 @@ private fun EmiCardItem(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(CircleShape)
-                    .background(if (emi.isPaidThisMonth) SagePastel else ApricotPastel),
+                    .background(iconBg),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (emi.isPaidThisMonth) Icons.Default.Check else Icons.Default.CreditCard,
                     contentDescription = null,
-                    tint = if (emi.isPaidThisMonth) SagePrimary else ApricotCaution,
+                    tint = iconTint,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -487,12 +517,8 @@ private fun EmiCardItem(
                 Box(
                     modifier = Modifier
                         .clip(ZenPillShape)
-                        .background(if (emi.isPaidThisMonth) SagePastel else PorcelainBg)
-                        .border(
-                            1.dp,
-                            if (emi.isPaidThisMonth) SagePrimary else ZenCardBorder,
-                            ZenPillShape
-                        )
+                        .background(buttonBg)
+                        .border(1.dp, buttonBorder, ZenPillShape)
                         .clickable {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             onTogglePaid()
@@ -503,7 +529,7 @@ private fun EmiCardItem(
                         text = if (emi.isPaidThisMonth) "Paid ✓" else "Mark Paid",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (emi.isPaidThisMonth) SagePrimary else ZenTextSecondary
+                        color = buttonText
                     )
                 }
             }

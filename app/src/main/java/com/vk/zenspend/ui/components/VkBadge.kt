@@ -20,7 +20,8 @@ import androidx.compose.ui.unit.sp
 import com.vk.zenspend.ui.theme.PorcelainBgSubtle
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePrimary
-import com.vk.zenspend.ui.theme.ZenCardBorder
+import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextPrimary
 import com.vk.zenspend.ui.theme.ZenTextSecondary
@@ -32,8 +33,8 @@ fun VkBadge(
     Row(
         modifier = modifier
             .clip(ZenPillShape)
-            .background(PorcelainBgSubtle)
-            .border(1.dp, ZenCardBorder, ZenPillShape)
+            .background(ZenColorSurfaceVariant)
+            .border(1.dp, ZenColorBorder, ZenPillShape)
             .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

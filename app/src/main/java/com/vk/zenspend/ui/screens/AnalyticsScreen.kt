@@ -47,9 +47,15 @@ import com.vk.zenspend.ui.components.BezierTrendChart
 import com.vk.zenspend.ui.components.MorphingDonutChart
 import com.vk.zenspend.ui.components.ZenCard
 import com.vk.zenspend.ui.theme.ApricotCaution
+import com.vk.zenspend.ui.theme.DarkSagePastel
+import com.vk.zenspend.ui.theme.DarkSagePrimary
+import com.vk.zenspend.ui.theme.DarkTerracottaPastel
+import com.vk.zenspend.ui.theme.LocalIsDarkTheme
 import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenColorBorder
+import com.vk.zenspend.ui.theme.ZenColorSagePastel
+import com.vk.zenspend.ui.theme.ZenColorSagePrimary
 import com.vk.zenspend.ui.theme.ZenColorSurface
 import com.vk.zenspend.ui.theme.ZenColorTextMuted
 import com.vk.zenspend.ui.theme.ZenColorTextPrimary
@@ -161,9 +167,18 @@ fun AnalyticsScreen(
                         )
 
                         // More Spent / Less Spent Status Pill
+                        val isDark = LocalIsDarkTheme.current
                         val isMore = comparison.isMoreSpent
-                        val badgeBg = if (isMore) TerracottaPastel else SagePastel
-                        val badgeColor = if (isMore) TerracottaAlert else SagePrimary
+                        val badgeBg = if (isMore) {
+                            if (isDark) DarkTerracottaPastel else TerracottaPastel
+                        } else {
+                            if (isDark) DarkSagePastel else SagePastel
+                        }
+                        val badgeColor = if (isMore) {
+                            TerracottaAlert
+                        } else {
+                            if (isDark) DarkSagePrimary else SagePrimary
+                        }
                         val badgeIcon = if (isMore) Icons.Default.TrendingUp else Icons.Default.TrendingDown
 
                         Box(
@@ -201,11 +216,17 @@ fun AnalyticsScreen(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
+                    val summaryColor = if (comparison.isMoreSpent) {
+                        TerracottaAlert
+                    } else {
+                        if (isDark) DarkSagePrimary else SagePrimary
+                    }
+
                     Text(
                         text = comparison.summaryText,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = if (comparison.isMoreSpent) TerracottaAlert else SagePrimary
+                        color = summaryColor
                     )
 
                     Spacer(modifier = Modifier.height(6.dp))
@@ -239,7 +260,7 @@ fun AnalyticsScreen(
                             Icon(
                                 imageVector = Icons.Default.PieChart,
                                 contentDescription = "Category Donut",
-                                tint = SagePrimary,
+                                tint = ZenColorSagePrimary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -284,7 +305,7 @@ fun AnalyticsScreen(
                             Icon(
                                 imageVector = Icons.Default.AutoGraph,
                                 contentDescription = "Trend Line",
-                                tint = SagePrimary,
+                                tint = ZenColorSagePrimary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -305,10 +326,17 @@ fun AnalyticsScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
+                    val isDarkTheme = LocalIsDarkTheme.current
+                    val trendFill = if (comparison.isMoreSpent) {
+                        ApricotCaution.copy(alpha = 0.25f)
+                    } else {
+                        if (isDarkTheme) DarkSagePastel.copy(alpha = 0.55f) else SagePastel.copy(alpha = 0.55f)
+                    }
+
                     BezierTrendChart(
                         points = trendPoints,
                         lineColor = if (comparison.isMoreSpent) ApricotCaution else SageAccent,
-                        fillColor = if (comparison.isMoreSpent) ApricotCaution.copy(alpha = 0.25f) else SagePastel.copy(alpha = 0.55f)
+                        fillColor = trendFill
                     )
                 }
             }
@@ -331,7 +359,7 @@ private fun PeriodTabPill(
     Box(
         modifier = modifier
             .clip(ZenPillShape)
-            .background(if (isSelected) SagePrimary else Color.Transparent)
+            .background(if (isSelected) ZenColorSagePrimary else Color.Transparent)
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
