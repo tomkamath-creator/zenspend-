@@ -39,6 +39,10 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -53,6 +57,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,14 +67,11 @@ import com.vk.zenspend.domain.model.Category
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.ui.components.AddTransactionSheet
-import com.vk.zenspend.ui.components.AllowanceCircle
-import com.vk.zenspend.ui.components.AllowanceCircleDefaults
-import com.vk.zenspend.ui.components.AllowanceGaugeState
-import com.vk.zenspend.ui.components.ImageViewerDialog
+import com.vk.zenspend.ui.components.CalmAllowanceGauge
+import com.vk.zenspend.ui.components.ReceiptViewerModal
 import com.vk.zenspend.ui.components.RollingTickerText
 import com.vk.zenspend.ui.components.SetBudgetSheet
 import com.vk.zenspend.ui.components.ZenCard
-import com.vk.zenspend.ui.viewmodel.ZenSpendViewModel
 import com.vk.zenspend.ui.theme.DarkSagePastel
 import com.vk.zenspend.ui.theme.DarkSagePrimary
 import com.vk.zenspend.ui.theme.DarkTerracottaPastel
