@@ -1,9 +1,11 @@
 package com.vk.zenspend.ui.components
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,10 +25,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +42,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,37 +53,41 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vk.zenspend.domain.model.Category
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
+import com.vk.zenspend.domain.util.ImageStorageHelper
 import com.vk.zenspend.domain.util.MathEvaluator
+import com.vk.zenspend.ui.theme.ApricotCaution
 import com.vk.zenspend.ui.theme.DarkSagePastel
 import com.vk.zenspend.ui.theme.DarkSagePrimary
 import com.vk.zenspend.ui.theme.DarkTerracottaPastel
 import com.vk.zenspend.ui.theme.LocalIsDarkTheme
-import com.vk.zenspend.ui.theme.PorcelainBg
 import com.vk.zenspend.ui.theme.SageAccent
 import com.vk.zenspend.ui.theme.SagePastel
 import com.vk.zenspend.ui.theme.SagePrimary
 import com.vk.zenspend.ui.theme.TerracottaAlert
 import com.vk.zenspend.ui.theme.TerracottaPastel
 import com.vk.zenspend.ui.theme.ZenBottomSheetShape
-import com.vk.zenspend.ui.theme.ZenCardBorder
 import com.vk.zenspend.ui.theme.ZenColorBorder
 import com.vk.zenspend.ui.theme.ZenColorSagePastel
 import com.vk.zenspend.ui.theme.ZenColorSagePrimary
 import com.vk.zenspend.ui.theme.ZenColorSurface
 import com.vk.zenspend.ui.theme.ZenColorSurfaceVariant
-import com.vk.zenspend.ui.theme.ZenColorTextMuted
 import com.vk.zenspend.ui.theme.ZenColorTextPrimary
 import com.vk.zenspend.ui.theme.ZenColorTextSecondary
 import com.vk.zenspend.ui.theme.ZenPillShape
 import com.vk.zenspend.ui.theme.ZenTextMuted
 import com.vk.zenspend.ui.theme.ZenTextPrimary
 import com.vk.zenspend.ui.theme.ZenTextSecondary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,24 +95,64 @@ import java.util.Locale
 fun AddTransactionSheet(
     sheetState: SheetState,
     categories: List<Category>,
+    transactionToEdit: Transaction? = null,
     onDismiss: () -> Unit,
-    onSaveTransaction: (Transaction) -> Unit
+    onSaveTransaction: (Transaction) -> Unit,
+    onAddCustomCategory: ((name: String, iconName: String, colorHex: Long) -> Unit)? = null
 ) {
-    var rawInput by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(TransactionType.EXPENSE) }
-    var title by remember { mutableStateOf("") }
-    var note by remember { mutableStateOf("") }
-    var receiptUri by remember { mutableStateOf<Uri?>(null) }
+    val context = LocalContext.current
+    val isEditMode = transactionToEdit != null
+
+    var rawInput by remember(transactionToEdit) {
+        mutableStateOf(
+            transactionToEdit?.amount?.let {
+                if (it % 1.0 == 0.0) it.toLong().toString() else it.toString()
+            } ?: ""
+        )
+    }
+    var selectedType by remember(transactionToEdit) {
+        mutableStateOf(transactionToEdit?.type ?: TransactionType.EXPENSE)
+    }
+    var title by remember(transactionToEdit) {
+        mutableStateOf(transactionToEdit?.title ?: "")
+    }
+    var note by remember(transactionToEdit) {
+        mutableStateOf(transactionToEdit?.note ?: "")
+    }
+    var receiptPath by remember(transactionToEdit) {
+        mutableStateOf(transactionToEdit?.receiptImagePath)
+    }
+    var receiptBitmap by remember(receiptPath) {
+        mutableStateOf<Bitmap?>(null)
+    }
+
+    LaunchedEffect(receiptPath) {
+        if (!receiptPath.isNullOrBlank()) {
+            withContext(Dispatchers.IO) {
+                receiptBitmap = ImageStorageHelper.loadBitmap(receiptPath!!, context)
+            }
+        } else {
+            receiptBitmap = null
+        }
+    }
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        receiptUri = uri
+        if (uri != null) {
+            val localSavedPath = ImageStorageHelper.saveImageLocally(context, uri)
+            receiptPath = localSavedPath ?: uri.toString()
+        }
     }
 
-    var selectedCategory by remember {
-        mutableStateOf(categories.firstOrNull { it.type == selectedType } ?: categories.firstOrNull())
+    // No preselected category when adding fresh! User MUST select one
+    var selectedCategory by remember(transactionToEdit) {
+        mutableStateOf<Category?>(
+            transactionToEdit?.let { tx -> categories.find { it.id == tx.categoryId } }
+        )
     }
+
+    var showCustomCategoryDialog by remember { mutableStateOf(false) }
 
     val evaluatedAmount = MathEvaluator.evaluate(rawInput)
 
@@ -133,7 +184,7 @@ fun AddTransactionSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Add Expense / Income",
+                    text = if (isEditMode) "Edit Transaction" else "Add Transaction",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = ZenTextPrimary
@@ -154,7 +205,9 @@ fun AddTransactionSheet(
                         activeBg = TerracottaPastel
                     ) {
                         selectedType = TransactionType.EXPENSE
-                        selectedCategory = categories.firstOrNull { it.type == TransactionType.EXPENSE }
+                        if (selectedCategory?.type != TransactionType.EXPENSE) {
+                            selectedCategory = null
+                        }
                     }
 
                     TypeToggleButton(
@@ -164,7 +217,9 @@ fun AddTransactionSheet(
                         activeBg = SagePastel
                     ) {
                         selectedType = TransactionType.INCOME
-                        selectedCategory = categories.firstOrNull { it.type == TransactionType.INCOME }
+                        if (selectedCategory?.type != TransactionType.INCOME) {
+                            selectedCategory = null
+                        }
                     }
                 }
             }
@@ -193,7 +248,6 @@ fun AddTransactionSheet(
                             color = if (rawInput.isEmpty()) ZenTextMuted else ZenTextPrimary
                         )
 
-                        // Real-time calculated preview in ₹
                         if (evaluatedAmount != null && rawInput.any { it in "+-×÷*/" }) {
                             Text(
                                 text = String.format(Locale.US, "= ₹%.2f", evaluatedAmount),
@@ -206,7 +260,7 @@ fun AddTransactionSheet(
 
                     if (rawInput.any { it in "+-×÷*/" }) {
                         Text(
-                            text = "Inline calculator active",
+                            text = "Calculator active",
                             fontSize = 11.sp,
                             color = ZenColorSagePrimary
                         )
@@ -216,13 +270,13 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Expense Name / Label Field
+            // Name / Label Field
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
                 placeholder = {
                     Text(
-                        text = "Expense Name (e.g. DMart Grocery, Coffee, Rent)",
+                        text = "Expense Name (e.g. Grocery, Dining, Cab)",
                         fontSize = 13.sp,
                         color = ZenTextMuted
                     )
@@ -242,10 +296,36 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Category Horizontal Selector
+            // Category Selection Header & Warning
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (selectedCategory == null) "Select Category *" else "Category: ${selectedCategory?.name}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (selectedCategory == null) ApricotCaution else ZenColorTextSecondary
+                )
+
+                if (selectedCategory == null) {
+                    Text(
+                        text = "(Required)",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = ApricotCaution
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Category Horizontal Selector + Custom Category Button
             val filteredCategories = categories.filter { it.type == selectedType }
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 items(filteredCategories) { cat ->
                     val isSelected = selectedCategory?.id == cat.id
@@ -256,11 +336,39 @@ fun AddTransactionSheet(
                         selectedCategory = cat
                     }
                 }
+
+                // Add Custom Category Chip
+                item {
+                    Box(
+                        modifier = Modifier
+                            .clip(ZenPillShape)
+                            .background(ZenColorSurfaceVariant)
+                            .border(1.dp, SageAccent, ZenPillShape)
+                            .clickable { showCustomCategoryDialog = true }
+                            .padding(horizontal = 14.dp, vertical = 7.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = SageAccent,
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Custom",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = SageAccent
+                            )
+                        }
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            // Prominent Attach Bill / Receipt Photo Card
+            // Attached Bill / Screenshot Photo Card
             ZenCard(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -276,42 +384,57 @@ fun AddTransactionSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(38.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(if (receiptUri != null) ZenColorSagePastel else ZenColorSurfaceVariant)
-                                .border(1.dp, if (receiptUri != null) SageAccent else ZenColorBorder, RoundedCornerShape(10.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = if (receiptUri != null) Icons.Default.Check else Icons.Default.AddPhotoAlternate,
-                                contentDescription = "Bill Icon",
-                                tint = if (receiptUri != null) ZenColorSagePrimary else ZenTextSecondary,
-                                modifier = Modifier.size(20.dp)
+                        if (receiptBitmap != null) {
+                            Image(
+                                bitmap = receiptBitmap!!.asImageBitmap(),
+                                contentDescription = "Attached receipt preview",
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .border(1.dp, SageAccent, RoundedCornerShape(10.dp)),
+                                contentScale = ContentScale.Crop
                             )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(44.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (receiptPath != null) ZenColorSagePastel else ZenColorSurfaceVariant)
+                                    .border(1.dp, if (receiptPath != null) SageAccent else ZenColorBorder, RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = if (receiptPath != null) Icons.Default.Check else Icons.Default.AddPhotoAlternate,
+                                    contentDescription = "Bill Icon",
+                                    tint = if (receiptPath != null) ZenColorSagePrimary else ZenTextSecondary,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Column {
                             Text(
-                                text = if (receiptUri != null) "✓ Bill / Invoice Attached" else "Attach Bill or Invoice Photo",
+                                text = if (receiptPath != null) "✓ Bill / Screenshot Attached" else "Attach Bill or Screenshot",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (receiptUri != null) ZenColorSagePrimary else ZenTextPrimary
+                                color = if (receiptPath != null) ZenColorSagePrimary else ZenTextPrimary
                             )
                             Text(
-                                text = if (receiptUri != null) "Tap to change image" else "Upload receipt photo from gallery (Optional)",
+                                text = if (receiptPath != null) "Tap to change image" else "Select photo from device (Optional)",
                                 fontSize = 11.sp,
                                 color = ZenTextMuted
                             )
                         }
                     }
 
-                    if (receiptUri != null) {
+                    if (receiptPath != null) {
                         IconButton(
-                            onClick = { receiptUri = null },
+                            onClick = {
+                                receiptPath = null
+                                receiptBitmap = null
+                            },
                             modifier = Modifier.size(32.dp)
                         ) {
                             Icon(
@@ -341,7 +464,7 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Integrated Custom Calculator Numpad
+            // Custom Calculator Numpad
             CalculatorNumpad(
                 onDigitClick = { digit ->
                     if (rawInput.length < 24) {
@@ -366,18 +489,20 @@ fun AddTransactionSheet(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Confirm Button
+            // Confirm / Save Button
+            val canSave = (evaluatedAmount ?: 0.0) > 0.0 && selectedCategory != null
+
             Button(
                 onClick = {
                     val finalAmount = evaluatedAmount ?: 0.0
-                    val currentCat = selectedCategory ?: categories.firstOrNull()
+                    val currentCat = selectedCategory
                     if (finalAmount > 0.0 && currentCat != null) {
                         val finalTitle = when {
                             title.isNotBlank() -> title.trim()
                             else -> currentCat.name
                         }
-                        val newTx = Transaction(
-                            id = 0L,
+                        val finalTx = Transaction(
+                            id = transactionToEdit?.id ?: 0L,
                             title = finalTitle,
                             amount = finalAmount,
                             type = selectedType,
@@ -385,39 +510,170 @@ fun AddTransactionSheet(
                             categoryName = currentCat.name,
                             categoryIcon = currentCat.iconName,
                             categoryColor = currentCat.colorHex,
-                            timestamp = System.currentTimeMillis(),
+                            timestamp = transactionToEdit?.timestamp ?: System.currentTimeMillis(),
                             note = note.takeIf { it.isNotBlank() },
-                            receiptImagePath = receiptUri?.toString()
+                            receiptImagePath = receiptPath
                         )
-                        onSaveTransaction(newTx)
+                        onSaveTransaction(finalTx)
                         onDismiss()
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                enabled = (evaluatedAmount ?: 0.0) > 0.0,
+                enabled = canSave,
                 shape = RoundedCornerShape(18.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ZenColorSagePrimary,
                     disabledContainerColor = ZenColorSurfaceVariant
                 )
             ) {
+                val buttonText = when {
+                    selectedCategory == null -> "Please Select a Category"
+                    (evaluatedAmount ?: 0.0) <= 0.0 -> "Enter Amount in ₹"
+                    isEditMode -> String.format(Locale.US, "Update Transaction • ₹%.2f", evaluatedAmount)
+                    else -> String.format(Locale.US, "Save %s • ₹%.2f", if (selectedType == TransactionType.EXPENSE) "Expense" else "Income", evaluatedAmount)
+                }
+
                 Text(
-                    text = if ((evaluatedAmount ?: 0.0) > 0.0) {
-                        String.format(Locale.US, "Confirm • ₹%.2f", evaluatedAmount)
-                    } else {
-                        "Enter Amount in ₹"
-                    },
-                    fontSize = 16.sp,
+                    text = buttonText,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = if ((evaluatedAmount ?: 0.0) > 0.0) Color.White else ZenTextMuted
+                    color = if (canSave) Color.White else ZenTextMuted
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
+
+    if (showCustomCategoryDialog) {
+        CustomCategoryDialog(
+            onDismiss = { showCustomCategoryDialog = false },
+            onConfirm = { name, colorHex ->
+                onAddCustomCategory?.invoke(name, "Label", colorHex)
+                selectedCategory = Category(
+                    id = "custom_${System.currentTimeMillis()}",
+                    name = name,
+                    iconName = "Label",
+                    colorHex = colorHex,
+                    type = selectedType,
+                    isDefault = false
+                )
+                showCustomCategoryDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun CustomCategoryDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (name: String, colorHex: Long) -> Unit
+) {
+    var categoryName by remember { mutableStateOf("") }
+    val colors = listOf(
+        0xFF48BB78L, // Emerald
+        0xFF3182CEL, // Ocean
+        0xFF805AD5L, // Purple
+        0xFFD69E2EL, // Amber
+        0xFFE53E3EL, // Crimson
+        0xFF38B2ACL, // Teal
+        0xFFED64A6L  // Rose
+    )
+    var selectedColor by remember { mutableStateOf(colors[0]) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "New Custom Category",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = ZenTextPrimary
+            )
+        },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = categoryName,
+                    onValueChange = { categoryName = it },
+                    label = { Text("Category Name") },
+                    placeholder = { Text("e.g. Gym, Pet Food, Coffee") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = ZenColorTextPrimary,
+                        unfocusedTextColor = ZenColorTextPrimary,
+                        focusedBorderColor = SageAccent,
+                        unfocusedBorderColor = ZenColorBorder
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Text(
+                    text = "Pick Category Color",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = ZenTextSecondary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    colors.forEach { colorVal ->
+                        val isPicked = selectedColor == colorVal
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(CircleShape)
+                                .background(Color(colorVal))
+                                .border(
+                                    width = if (isPicked) 3.dp else 1.dp,
+                                    color = if (isPicked) ZenColorTextPrimary else Color.Transparent,
+                                    shape = CircleShape
+                                )
+                                .clickable { selectedColor = colorVal },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (isPicked) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (categoryName.isNotBlank()) {
+                        onConfirm(categoryName.trim(), selectedColor)
+                    }
+                },
+                enabled = categoryName.isNotBlank(),
+                colors = ButtonDefaults.buttonColors(containerColor = ZenColorSagePrimary)
+            ) {
+                Text("Create")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel", color = ZenTextMuted)
+            }
+        },
+        containerColor = ZenColorSurface,
+        shape = RoundedCornerShape(20.dp)
+    )
 }
 
 @Composable
@@ -462,30 +718,39 @@ private fun CategoryChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val borderColor = if (isSelected) ZenColorSagePrimary else ZenColorBorder
-    val bgColor = if (isSelected) ZenColorSagePastel else ZenColorSurfaceVariant
+    val isDark = LocalIsDarkTheme.current
+    val baseColor = Color(category.colorHex)
+    val bgColor = if (isSelected) {
+        if (isDark) baseColor.copy(alpha = 0.28f) else baseColor.copy(alpha = 0.15f)
+    } else {
+        ZenColorSurfaceVariant
+    }
+    val borderColor = if (isSelected) baseColor else ZenColorBorder
 
-    Row(
+    Box(
         modifier = Modifier
             .clip(ZenPillShape)
             .background(bgColor)
-            .border(1.dp, borderColor, ZenPillShape)
+            .border(if (isSelected) 1.5.dp else 1.dp, borderColor, ZenPillShape)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 7.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 14.dp, vertical = 7.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(Color(category.colorHex))
-        )
-        Spacer(modifier = Modifier.width(6.dp))
-        Text(
-            text = category.name,
-            fontSize = 12.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = ZenTextPrimary
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(baseColor)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = category.name,
+                fontSize = 12.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                color = if (isSelected) ZenTextPrimary else ZenTextSecondary
+            )
+        }
     }
 }

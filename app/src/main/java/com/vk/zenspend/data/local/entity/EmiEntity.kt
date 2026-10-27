@@ -13,5 +13,6 @@ data class EmiEntity(
     val totalTenureMonths: Int? = null,
     val remainingMonths: Int? = null,
     val isPaidThisMonth: Boolean = false,
-    val notes: String? = null
+    val notes: String? = null,
+    val commitmentType: String = "EMI"
 )

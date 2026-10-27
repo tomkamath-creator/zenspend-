@@ -1,5 +1,9 @@
 package com.vk.zenspend.ui.screens
 
+import android.content.Context
+import android.net.Uri
+import com.vk.zenspend.data.local.ZenSpendDatabase
+import com.vk.zenspend.domain.util.BackupHelper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vk.zenspend.data.repository.UserPreferencesRepository
@@ -41,7 +45,8 @@ class ZenSpendViewModel @Inject constructor(
     private val budgetRepository: BudgetRepository,
     private val debtRepository: DebtRepository,
     private val emiRepository: EmiRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val database: ZenSpendDatabase
 ) : ViewModel() {
 
     // 1-second splash screen control
@@ -244,7 +249,7 @@ class ZenSpendViewModel @Inject constructor(
         initialValue = 0.0
     )
 
-    // EMIs
+    // EMIs & Monthly Commitments
     val emis: StateFlow<List<Emi>> = emiRepository
         .getAllEmis()
         .stateIn(
@@ -253,6 +258,18 @@ class ZenSpendViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val emisList: StateFlow<List<Emi>> = emis.map { list ->
+        list.filter { it.commitmentType == "EMI" }
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = emptyList())
+
+    val mutualFundsList: StateFlow<List<Emi>> = emis.map { list ->
+        list.filter { it.commitmentType == "MUTUAL_FUND" }
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = emptyList())
+
+    val billsList: StateFlow<List<Emi>> = emis.map { list ->
+        list.filter { it.commitmentType == "BILL" }
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = emptyList())
+
     val totalMonthlyEmiBurden: StateFlow<Double> = emiRepository
         .getTotalMonthlyEmiBurden()
         .stateIn(
@@ -260,6 +277,14 @@ class ZenSpendViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = 0.0
         )
+
+    val totalMonthlyInvestedPaid: StateFlow<Double> = emis.map { list ->
+        list.filter { it.isPaidThisMonth }.sumOf { it.monthlyAmount }
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0.0)
+
+    val totalMonthlyPending: StateFlow<Double> = combine(totalMonthlyEmiBurden, totalMonthlyInvestedPaid) { total, paid ->
+        max(0.0, total - paid)
+    }.stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(5000), initialValue = 0.0)
 
     // Search & Filter
     val searchQuery = MutableStateFlow("")
@@ -469,9 +494,30 @@ class ZenSpendViewModel @Inject constructor(
         }
     }
 
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            transactionRepository.updateTransaction(transaction)
+        }
+    }
+
     fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             transactionRepository.deleteTransaction(transaction)
+        }
+    }
+
+    fun addCustomCategory(name: String, iconName: String, colorHex: Long) {
+        viewModelScope.launch {
+            categoryRepository.insertCategory(
+                Category(
+                    id = "custom_${System.currentTimeMillis()}",
+                    name = name,
+                    iconName = iconName,
+                    colorHex = colorHex,
+                    type = TransactionType.EXPENSE,
+                    isDefault = false
+                )
+            )
         }
     }
 
@@ -493,6 +539,12 @@ class ZenSpendViewModel @Inject constructor(
         }
     }
 
+    fun updateEmi(emi: Emi) {
+        viewModelScope.launch {
+            emiRepository.updateEmi(emi)
+        }
+    }
+
     fun deleteEmi(emi: Emi) {
         viewModelScope.launch {
             emiRepository.deleteEmi(emi)
@@ -503,24 +555,62 @@ class ZenSpendViewModel @Inject constructor(
         viewModelScope.launch {
             val newStatus = !emi.isPaidThisMonth
             emiRepository.setEmiPaidStatus(emi.id, newStatus)
-            // If marked as paid, automatically log this EMI as an expense transaction!
             if (newStatus) {
+                val (catName, catId, icon, colorHex) = when (emi.commitmentType) {
+                    "MUTUAL_FUND" -> Quadruple("Investment & Savings", "mindful_investing", "TrendingUp", 0xFF38B2ACL)
+                    "BILL" -> Quadruple("Bills & Utilities", "calm_essentials", "Payments", 0xFFED8936L)
+                    else -> Quadruple("Bills & Utilities", "calm_essentials", "Payments", 0xFFED8936L)
+                }
+                val prefix = when (emi.commitmentType) {
+                    "MUTUAL_FUND" -> "SIP"
+                    "BILL" -> "Bill"
+                    else -> "EMI"
+                }
                 transactionRepository.insertTransaction(
                     Transaction(
-                        title = "EMI: ${emi.title}",
+                        title = "$prefix: ${emi.title}",
                         amount = emi.monthlyAmount,
                         type = TransactionType.EXPENSE,
-                        categoryId = "calm_essentials",
-                        categoryName = "Bills & Utilities",
-                        categoryIcon = "Payments",
-                        categoryColor = 0xFFED8936L,
+                        categoryId = catId,
+                        categoryName = catName,
+                        categoryIcon = icon,
+                        categoryColor = colorHex,
                         timestamp = System.currentTimeMillis(),
-                        note = "Automatic EMI payment logged"
+                        note = "Monthly $prefix payment logged"
                     )
                 )
             }
         }
     }
+
+    fun exportBackup(context: Context) {
+        viewModelScope.launch {
+            BackupHelper.createBackupFileAndShare(context, database)
+        }
+    }
+
+    fun importBackup(context: Context, uri: Uri, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val jsonString = context.contentResolver.openInputStream(uri)?.use { stream ->
+                    stream.bufferedReader(Charsets.UTF_8).readText()
+                } ?: run {
+                    onResult(false, "Could not read backup file")
+                    return@launch
+                }
+                val result = BackupHelper.importDataFromJson(database, jsonString)
+                if (result.isSuccess) {
+                    onResult(true, "Restored ${result.getOrNull()} items successfully!")
+                } else {
+                    onResult(false, result.exceptionOrNull()?.message ?: "Import failed")
+                }
+            } catch (e: Exception) {
+                onResult(false, e.localizedMessage ?: "Import failed")
+            }
+        }
+    }
+
+private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 
     private fun StateFlow<List<Transaction>>.mapGroupedByDate(): StateFlow<Map<String, List<Transaction>>> {
         return combine(this, totalExpensesThisMonth) { txList, _ ->

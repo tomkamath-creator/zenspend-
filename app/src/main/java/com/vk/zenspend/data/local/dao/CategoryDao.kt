@@ -14,6 +14,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories ORDER BY isDefault DESC, name ASC")
     fun getAllCategories(): Flow<List<CategoryEntity>>
 
+    @Query("SELECT * FROM categories")
+    suspend fun getAllCategoriesList(): List<CategoryEntity>
+
     @Query("SELECT * FROM categories WHERE id = :id LIMIT 1")
     fun getCategoryById(id: String): Flow<CategoryEntity?>
 

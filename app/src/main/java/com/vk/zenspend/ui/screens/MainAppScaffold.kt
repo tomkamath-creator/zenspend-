@@ -44,10 +44,6 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vk.zenspend.ui.theme.PorcelainBg
-import com.vk.zenspend.ui.theme.SagePastel
-import com.vk.zenspend.ui.theme.SagePrimary
-import com.vk.zenspend.ui.theme.ZenCardBorder
 import com.vk.zenspend.ui.theme.ZenColorBackground
 import com.vk.zenspend.ui.theme.ZenColorBorder
 import com.vk.zenspend.ui.theme.ZenColorSagePastel
@@ -56,14 +52,13 @@ import com.vk.zenspend.ui.theme.ZenColorSurface
 import com.vk.zenspend.ui.theme.ZenColorTextMuted
 import com.vk.zenspend.ui.theme.ZenMotion
 import com.vk.zenspend.ui.theme.ZenPillShape
-import com.vk.zenspend.ui.theme.ZenTextMuted
 
 /**
  * Main App Container with Crystal-Clear 4-Tab Bottom Navigation:
- * Tab 0: Home (Dashboard & Daily Calm Allowance Gauge)
- * Tab 1: Analytics (Morphing Donut, Bézier Trend Line, Monthly & Yearly Spend)
- * Tab 2: Expenses (Search, Filter, Full Ledger, Attached Bills)
- * Tab 3: Budget & Loans (Set Monthly Budget Limit & EMI / Loan Tracker)
+ * Tab 0: Overview (Dashboard & Daily Allowance Gauge)
+ * Tab 1: Daily Spend (Daily Expenditure, Search, Category Filter & Attached Bills)
+ * Tab 2: Monthly Fixed (EMIs, Mutual Funds SIPs & Recurring Bills)
+ * Tab 3: Analytics (Spend Breakdown, Morphing Donut & Bézier Trend Chart)
  */
 @Composable
 fun MainAppScaffold(
@@ -98,7 +93,7 @@ fun MainAppScaffold(
                 ) {
                     NavTabItem(
                         icon = Icons.Default.Home,
-                        label = "Home",
+                        label = "Overview",
                         isSelected = selectedTab == 0,
                         modifier = Modifier.weight(1f)
                     ) {
@@ -107,8 +102,8 @@ fun MainAppScaffold(
                     }
 
                     NavTabItem(
-                        icon = Icons.Default.PieChart,
-                        label = "Analytics",
+                        icon = Icons.Default.ReceiptLong,
+                        label = "Daily Spend",
                         isSelected = selectedTab == 1,
                         modifier = Modifier.weight(1f)
                     ) {
@@ -117,18 +112,18 @@ fun MainAppScaffold(
                     }
 
                     NavTabItem(
-                        icon = Icons.Default.ReceiptLong,
-                        label = "Expenses",
+                        icon = Icons.Default.AccountBalanceWallet,
+                        label = "Monthly Fixed",
                         isSelected = selectedTab == 2,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1.1f)
                     ) {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         selectedTab = 2
                     }
 
                     NavTabItem(
-                        icon = Icons.Default.AccountBalanceWallet,
-                        label = "Budget & EMI",
+                        icon = Icons.Default.PieChart,
+                        label = "Analytics",
                         isSelected = selectedTab == 3,
                         modifier = Modifier.weight(1f)
                     ) {
@@ -155,9 +150,9 @@ fun MainAppScaffold(
             ) { tab ->
                 when (tab) {
                     0 -> ZenDashboardScreen(viewModel = viewModel)
-                    1 -> AnalyticsScreen(viewModel = viewModel)
-                    2 -> ExpensesLedgerScreen(viewModel = viewModel)
-                    3 -> BudgetAndEmiScreen(viewModel = viewModel)
+                    1 -> ExpensesLedgerScreen(viewModel = viewModel)
+                    2 -> BudgetAndEmiScreen(viewModel = viewModel)
+                    3 -> AnalyticsScreen(viewModel = viewModel)
                 }
             }
         }
@@ -180,7 +175,7 @@ private fun NavTabItem(
             .clip(RoundedCornerShape(18.dp))
             .background(bgColor)
             .clickable(onClick = onClick)
-            .padding(horizontal = 6.dp, vertical = 7.dp),
+            .padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -188,7 +183,7 @@ private fun NavTabItem(
             imageVector = icon,
             contentDescription = label,
             tint = contentColor,
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.height(3.dp))
         Text(

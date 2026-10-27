@@ -111,7 +111,8 @@ fun com.vk.zenspend.data.local.entity.EmiEntity.toDomain(): com.vk.zenspend.doma
     totalTenureMonths = totalTenureMonths,
     remainingMonths = remainingMonths,
     isPaidThisMonth = isPaidThisMonth,
-    notes = notes
+    notes = notes,
+    commitmentType = commitmentType
 )
 
 fun com.vk.zenspend.domain.model.Emi.toEntity(): com.vk.zenspend.data.local.entity.EmiEntity = com.vk.zenspend.data.local.entity.EmiEntity(
@@ -122,5 +123,6 @@ fun com.vk.zenspend.domain.model.Emi.toEntity(): com.vk.zenspend.data.local.enti
     totalTenureMonths = totalTenureMonths,
     remainingMonths = remainingMonths,
     isPaidThisMonth = isPaidThisMonth,
-    notes = notes
+    notes = notes,
+    commitmentType = commitmentType
 )

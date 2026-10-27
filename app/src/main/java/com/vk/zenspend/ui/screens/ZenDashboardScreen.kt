@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -32,7 +33,7 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.ReceiptLong
-import androidx.compose.material.icons.filled.Spa
+import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -67,6 +68,7 @@ import com.vk.zenspend.domain.model.Category
 import com.vk.zenspend.domain.model.Transaction
 import com.vk.zenspend.domain.model.TransactionType
 import com.vk.zenspend.ui.components.AddTransactionSheet
+import com.vk.zenspend.ui.components.BackupSettingsModal
 import com.vk.zenspend.ui.components.CalmAllowanceGauge
 import com.vk.zenspend.ui.components.ReceiptViewerModal
 import com.vk.zenspend.ui.components.RollingTickerText
@@ -117,12 +119,16 @@ fun ZenDashboardScreen(
 
     val addSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val budgetSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val backupSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     var isAddSheetOpen by remember { mutableStateOf(false) }
     var isSetBudgetOpen by remember { mutableStateOf(false) }
+    var isBackupSettingsOpen by remember { mutableStateOf(false) }
+    var transactionToEdit by remember { mutableStateOf<Transaction?>(null) }
     var selectedReceiptUri by remember { mutableStateOf<Pair<String, String>?>(null) }
 
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val haptic = LocalHapticFeedback.current
 
     Scaffold(
@@ -132,21 +138,27 @@ fun ZenDashboardScreen(
             val interactionSource = remember { MutableInteractionSource() }
             val isPressed by interactionSource.collectIsPressedAsState()
             val fabScale by animateFloatAsState(
-                targetValue = if (isPressed) 0.88f else 1f,
+                targetValue = if (isPressed) 0.88f else 1.0f,
                 animationSpec = ZenMotion.DefaultSpring,
-                label = "fabBounce"
+                label = "fabScale"
             )
 
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    transactionToEdit = null
                     isAddSheetOpen = true
                 },
-                modifier = Modifier.scale(fabScale),
                 shape = CircleShape,
                 containerColor = ZenColorSagePrimary,
                 contentColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 6.dp,
+                    pressedElevation = 2.dp
+                ),
+                modifier = Modifier
+                    .scale(fabScale)
+                    .size(62.dp),
                 interactionSource = interactionSource
             ) {
                 Icon(
@@ -167,7 +179,7 @@ fun ZenDashboardScreen(
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Top Header: Title & Tagline
+                // Top Header: Title, Dark Mode Toggle & Backup Button
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -190,6 +202,26 @@ fun ZenDashboardScreen(
                         }
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            // Backup & Restore Action Button
+                            IconButton(
+                                onClick = { isBackupSettingsOpen = true },
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(ZenColorSurface)
+                                    .border(1.dp, ZenColorBorder, CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Storage,
+                                    contentDescription = "Backup & Restore",
+                                    tint = ZenColorSagePrimary,
+                                    modifier = Modifier.size(17.dp)
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Dark / Light Mode Toggle Button
                             val isDarkTheme = LocalIsDarkTheme.current
                             IconButton(
                                 onClick = {
@@ -250,7 +282,7 @@ fun ZenDashboardScreen(
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
-                                        imageVector = Icons.Default.Spa,
+                                        imageVector = Icons.Default.AccountBalanceWallet,
                                         contentDescription = null,
                                         tint = ZenColorSagePrimary,
                                         modifier = Modifier.size(20.dp)
@@ -278,8 +310,8 @@ fun ZenDashboardScreen(
                                 ) {
                                     Text(
                                         text = "🎯 Set Monthly Budget Now",
-                                        fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color = Color.White
                                     )
                                 }
@@ -288,7 +320,7 @@ fun ZenDashboardScreen(
                     }
                 }
 
-                // Month's Calm Allowance Liquid Gauge with Water Drop Ripple Card
+                // Daily Budget Gauge Card
                 item {
                     ZenCard(
                         modifier = Modifier.fillMaxWidth(),
@@ -338,7 +370,7 @@ fun ZenDashboardScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Recent Expenses",
+                            text = "Recent Transactions",
                             fontSize = 17.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = ZenTextPrimary
@@ -361,21 +393,13 @@ fun ZenDashboardScreen(
                                     .padding(vertical = 24.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(56.dp)
-                                        .clip(CircleShape)
-                                        .background(ZenColorSagePastel),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Spa,
-                                        contentDescription = null,
-                                        tint = ZenColorSagePrimary,
-                                        modifier = Modifier.size(30.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Icon(
+                                    imageVector = Icons.Default.ReceiptLong,
+                                    contentDescription = null,
+                                    tint = ZenColorSagePrimary,
+                                    modifier = Modifier.size(36.dp)
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
                                 Text(
                                     text = "No expenses recorded yet",
                                     fontSize = 15.sp,
@@ -408,6 +432,10 @@ fun ZenDashboardScreen(
                                 onViewReceipt = { uri ->
                                     selectedReceiptUri = Pair(uri, tx.title)
                                 },
+                                onEdit = {
+                                    transactionToEdit = tx
+                                    isAddSheetOpen = true
+                                },
                                 onDelete = {
                                     viewModel.deleteTransaction(tx)
                                     scope.launch {
@@ -433,15 +461,27 @@ fun ZenDashboardScreen(
         }
     }
 
-    // Add Transaction Sheet
+    // Add / Edit Transaction Sheet
     if (isAddSheetOpen) {
         AddTransactionSheet(
             sheetState = addSheetState,
             categories = categories,
-            onDismiss = { isAddSheetOpen = false },
-            onSaveTransaction = { tx ->
-                viewModel.addTransaction(tx)
+            transactionToEdit = transactionToEdit,
+            onDismiss = {
                 isAddSheetOpen = false
+                transactionToEdit = null
+            },
+            onSaveTransaction = { tx ->
+                if (transactionToEdit != null) {
+                    viewModel.updateTransaction(tx)
+                } else {
+                    viewModel.addTransaction(tx)
+                }
+                transactionToEdit = null
+                isAddSheetOpen = false
+            },
+            onAddCustomCategory = { name, icon, color ->
+                viewModel.addCustomCategory(name, icon, color)
             }
         )
     }
@@ -454,11 +494,21 @@ fun ZenDashboardScreen(
             onDismiss = { isSetBudgetOpen = false },
             onSaveBudget = { newAmount ->
                 viewModel.setMonthlyBudget(newAmount)
+                isSetBudgetOpen = false
             }
         )
     }
 
-    // View Receipt Modal
+    // Backup & Restore Sheet
+    if (isBackupSettingsOpen) {
+        BackupSettingsModal(
+            sheetState = backupSheetState,
+            viewModel = viewModel,
+            onDismiss = { isBackupSettingsOpen = false }
+        )
+    }
+
+    // Fullscreen Attached Bill Preview Modal
     selectedReceiptUri?.let { (uri, title) ->
         ReceiptViewerModal(
             imageUriString = uri,
@@ -528,6 +578,7 @@ private fun MiniMetricBox(
 private fun DashboardTransactionRow(
     transaction: Transaction,
     onViewReceipt: (String) -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     val isExpense = transaction.type == TransactionType.EXPENSE
@@ -559,7 +610,7 @@ private fun DashboardTransactionRow(
                 )
             }
 
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -593,23 +644,36 @@ private fun DashboardTransactionRow(
             // Amount in ₹
             Text(
                 text = String.format(Locale.US, "%s₹%.2f", amountPrefix, transaction.amount),
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = amountColor
             )
 
+            // Edit Action Button
+            IconButton(
+                onClick = onEdit,
+                modifier = Modifier
+                    .padding(start = 2.dp)
+                    .size(28.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit",
+                    tint = ZenTextMuted,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
+
             // Delete action button
             IconButton(
                 onClick = onDelete,
-                modifier = Modifier
-                    .padding(start = 4.dp)
-                    .size(30.dp)
+                modifier = Modifier.size(28.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,
                     contentDescription = "Delete",
-                    tint = ZenTextMuted.copy(alpha = 0.6f),
-                    modifier = Modifier.size(18.dp)
+                    tint = ZenTextMuted.copy(alpha = 0.7f),
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }

@@ -15,8 +15,14 @@ interface EmiDao {
     @Query("SELECT * FROM emis ORDER BY isPaidThisMonth ASC, dueDayOfMonth ASC")
     fun getAllEmis(): Flow<List<EmiEntity>>
 
+    @Query("SELECT * FROM emis")
+    suspend fun getAllEmisList(): List<EmiEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEmi(emi: EmiEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEmis(emis: List<EmiEntity>)
 
     @Update
     suspend fun updateEmi(emi: EmiEntity)
